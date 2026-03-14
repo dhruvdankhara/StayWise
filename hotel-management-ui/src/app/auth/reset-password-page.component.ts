@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthService } from '../core/services/auth.service';
 import { BrandMarkComponent } from '../shared/components/brand-mark.component';
 
 @Component({
   selector: 'app-reset-password-page',
-  imports: [ReactiveFormsModule, RouterLink, BrandMarkComponent],
+  imports: [ReactiveFormsModule, BrandMarkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="auth-shell container">

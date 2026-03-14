@@ -1,4 +1,4 @@
-import { AsyncPipe, CurrencyPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -9,7 +9,7 @@ import { RoomService } from '../../core/services/room.service';
 
 @Component({
   selector: 'app-room-search-page',
-  imports: [AsyncPipe, CurrencyPipe, ReactiveFormsModule, RouterLink],
+  imports: [CurrencyPipe, ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="section container">
