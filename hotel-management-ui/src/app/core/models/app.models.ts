@@ -1,61 +1,159 @@
 export type UserRole = 'admin' | 'hotel_manager' | 'receptionist' | 'cleaning_staff' | 'guest';
 
-export interface SessionUser {
+export interface ApiEnvelope<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  details?: unknown;
+  errors?: unknown;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
+export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   role: UserRole;
-  phone: string;
+  isVerified?: boolean;
+  isActive?: boolean;
+  profileImage?: string;
+  preferences?: Record<string, unknown>;
 }
 
-export interface MetricCard {
-  label: string;
-  value: string;
-  change: string;
+export interface AuthSession {
+  token: string;
+  user: UserProfile;
 }
 
-export interface Room {
+export interface RoomListItem {
   id: string;
   roomNumber: string;
   type: string;
   floor: number;
   capacity: number;
-  rate: number;
+  baseRate: number;
   status: string;
   amenities: string[];
-  description: string;
+  images: string[];
+  description?: string;
+  isActive?: boolean;
 }
 
-export interface Booking {
+export interface BookingGuestSummary {
   id: string;
-  ref: string;
-  guestName: string;
+  name: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface BookingRoomSummary {
+  id: string;
   roomNumber: string;
-  roomType: string;
+  type: string;
+  floor?: number;
+  capacity?: number;
+  baseRate?: number;
+  images?: string[];
+}
+
+export interface BookingListItem {
+  id: string;
+  bookingRef: string;
   checkIn: string;
   checkOut: string;
+  actualCheckIn?: string;
+  actualCheckOut?: string;
+  guests: number;
   status: string;
-  amount: number;
+  totalAmount: number;
+  paymentStatus: string;
+  specialRequests?: string;
+  cancellationReason?: string;
+  guest?: BookingGuestSummary;
+  room?: BookingRoomSummary;
 }
 
-export interface TaskItem {
+export interface InvoiceLineItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface Invoice {
   id: string;
-  roomNumber: string;
+  bookingId: string;
+  guestId: string;
+  lineItems: InvoiceLineItem[];
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  discount: number;
+  discountReason?: string;
+  total: number;
+  paidAmount: number;
+  pdfUrl?: string;
+  issuedAt?: string;
+}
+
+export interface HousekeepingTask {
+  id: string;
   priority: string;
   status: string;
-  assignee: string;
-  note: string;
+  notes?: string;
+  scheduledFor: string;
+  startedAt?: string;
+  completedAt?: string;
+  room?: BookingRoomSummary;
+  assignedTo?: BookingGuestSummary;
+  assignedBy?: BookingGuestSummary;
 }
 
-export interface ReviewItem {
+export interface Review {
   id: string;
-  guestName: string;
-  roomType: string;
   rating: number;
-  comment: string;
+  comment?: string;
+  isVisible: boolean;
+  guest?: BookingGuestSummary;
+  room?: BookingRoomSummary;
+}
+
+export interface HotelSettings {
+  id?: string;
+  name: string;
+  address: string;
+  contactEmail: string;
+  contactPhone: string;
+  logoUrl?: string;
+  invoiceFooter: string;
+  taxRate: number;
+  currency: string;
+  checkInTime: string;
+  checkOutTime: string;
+}
+
+export interface UploadResult {
+  url: string;
+  filename?: string;
+  size?: number;
 }
 
 export interface NavItem {
   label: string;
   path: string;
 }
+
+export interface MetricCard {
+  label: string;
+  value: string;
+  hint: string;
+}
+
+export type ReportRow = Record<string, string | number | boolean | null | undefined>;

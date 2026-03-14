@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
+import { dashboardRouteByRole } from '../core/models/navigation';
 import { AuthService } from '../core/services/auth.service';
 import { BrandMarkComponent } from '../shared/components/brand-mark.component';
 
@@ -14,9 +15,9 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
       <div class="auth-copy">
         <app-brand-mark />
         <h1>Sign in to StayWise</h1>
-        <p>Use any seeded account email with <strong>Password@123</strong> to enter the corresponding panel.</p>
+        <p>Access the public booking flow or your role-based operations panel with a live API-backed session.</p>
         <div class="surface auth-demo">
-          <p class="eyebrow">Demo accounts</p>
+          <p class="eyebrow">Seeded accounts</p>
           <p>
             <code>admin@staywise.com</code>, <code>manager@staywise.com</code>,
             <code>reception@staywise.com</code>, <code>cleaning@staywise.com</code>,
@@ -37,6 +38,7 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
           <p class="error-text">{{ error() }}</p>
         }
         <button type="submit" class="button button--full">Continue</button>
+        <a routerLink="/auth/forgot-password">Forgot your password?</a>
         <a routerLink="/auth/register">Need an account? Register as a guest</a>
       </form>
     </section>
@@ -48,8 +50,8 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
   readonly error = signal('');
   readonly form = this.formBuilder.nonNullable.group({
-    email: ['guest@staywise.com', [Validators.required, Validators.email]],
-    password: ['Password@123', [Validators.required, Validators.minLength(8)]]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8)]]
   });
 
   async submit(): Promise<void> {
@@ -61,25 +63,14 @@ export class LoginPageComponent {
     }
 
     const { email, password } = this.form.getRawValue();
-    const success = await this.authService.login(email, password);
-
-    if (!success) {
-      this.error.set('Invalid credentials. Use a demo email with Password@123.');
+    try {
+      await this.authService.login(email, password);
+    } catch {
+      this.error.set('Invalid credentials or the API is unavailable.');
       return;
     }
 
     const role = this.authService.user()?.role;
-    const destination =
-      role === 'admin'
-        ? '/admin'
-        : role === 'hotel_manager'
-          ? '/hotel-manager'
-          : role === 'receptionist'
-            ? '/receptionist'
-            : role === 'cleaning_staff'
-              ? '/cleaning-staff'
-              : '/guest';
-
-    await this.router.navigateByUrl(destination);
+    await this.router.navigateByUrl(role ? dashboardRouteByRole[role] : '/guest');
   }
 }

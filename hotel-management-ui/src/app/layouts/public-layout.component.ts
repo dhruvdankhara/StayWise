@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
+import { dashboardRouteByRole } from '../core/models/navigation';
 import { AuthService } from '../core/services/auth.service';
 import { BrandMarkComponent } from '../shared/components/brand-mark.component';
 
@@ -37,17 +38,6 @@ export class PublicLayoutComponent {
   readonly user = this.authService.user;
   readonly dashboardPath = computed(() => {
     const role = this.user()?.role;
-    const rolePath =
-      role === 'admin'
-        ? '/admin'
-        : role === 'hotel_manager'
-          ? '/hotel-manager'
-          : role === 'receptionist'
-            ? '/receptionist'
-            : role === 'cleaning_staff'
-              ? '/cleaning-staff'
-              : '/guest';
-
-    return rolePath;
+    return role ? dashboardRouteByRole[role] : '/guest';
   });
 }

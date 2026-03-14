@@ -1,27 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-import type { NavItem, UserRole } from '../core/models/app.models';
+import { navigationByRole } from '../core/models/navigation';
 import { AuthService } from '../core/services/auth.service';
 import { BrandMarkComponent } from '../shared/components/brand-mark.component';
-
-const navigationByRole: Record<UserRole, NavItem[]> = {
-  admin: [
-    { label: 'Overview', path: '/admin' },
-    { label: 'Staff', path: '/admin/staff' },
-    { label: 'Rooms', path: '/admin/rooms' },
-    { label: 'Reports', path: '/admin/reports' }
-  ],
-  hotel_manager: [{ label: 'Overview', path: '/hotel-manager' }],
-  receptionist: [{ label: 'Overview', path: '/receptionist' }],
-  cleaning_staff: [{ label: 'Overview', path: '/cleaning-staff' }],
-  guest: [
-    { label: 'Overview', path: '/guest' },
-    { label: 'My Bookings', path: '/guest/bookings' },
-    { label: 'Profile', path: '/guest/profile' },
-    { label: 'Reviews', path: '/guest/reviews' }
-  ]
-};
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -38,7 +20,7 @@ const navigationByRole: Record<UserRole, NavItem[]> = {
         </div>
         <nav class="sidebar-nav" aria-label="Panel navigation">
           @for (item of navItems(); track item.path) {
-            <a [routerLink]="item.path" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: item.path.endsWith('guest') || item.path === '/admin' || item.path === '/hotel-manager' || item.path === '/receptionist' || item.path === '/cleaning-staff' }">{{ item.label }}</a>
+            <a [routerLink]="item.path" routerLinkActive="active-link">{{ item.label }}</a>
           }
         </nav>
         <button type="button" class="button button--ghost" (click)="authService.logout()">Sign out</button>

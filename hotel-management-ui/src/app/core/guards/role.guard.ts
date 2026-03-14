@@ -4,9 +4,10 @@ import { CanActivateFn, Router } from '@angular/router';
 import type { UserRole } from '../models/app.models';
 import { AuthService } from '../services/auth.service';
 
-export const roleGuard = (roles: UserRole[]): CanActivateFn => () => {
+export const roleGuard = (roles: UserRole[]): CanActivateFn => async () => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  await authService.bootstrap();
   const user = authService.user();
 
   if (!user) {

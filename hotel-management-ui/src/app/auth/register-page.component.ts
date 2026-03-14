@@ -14,7 +14,7 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
       <div class="auth-copy">
         <app-brand-mark />
         <h1>Create your guest account</h1>
-        <p>Register as a guest to preview the self-service booking area and profile flows.</p>
+        <p>Create a live guest account, verify your email, and continue into the booking journey.</p>
       </div>
       <form class="surface auth-form" [formGroup]="form" (ngSubmit)="submit()">
         <label>
@@ -62,10 +62,10 @@ export class RegisterPageComponent {
       return;
     }
 
-    const success = await this.authService.register(this.form.getRawValue());
-
-    if (!success) {
-      this.error.set('Please provide valid details.');
+    try {
+      await this.authService.register(this.form.getRawValue());
+    } catch {
+      this.error.set('Unable to create the account right now.');
       return;
     }
 
