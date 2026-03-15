@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { BookingService } from '../../core/services/booking.service';
 
 @Component({
-  selector: 'app-guest-management-page',
+  selector: 'app-receptionist-guests-page',
   imports: [AsyncPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -36,7 +36,7 @@ import { BookingService } from '../../core/services/booking.service';
     </section>
   `
 })
-export class GuestManagementPageComponent {
+export class ReceptionistGuestsPageComponent {
   private readonly bookingService = inject(BookingService);
   readonly guests$ = this.bookingService.listBookings().pipe(
     map((result) =>

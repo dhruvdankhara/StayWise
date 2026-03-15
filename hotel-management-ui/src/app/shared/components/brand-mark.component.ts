@@ -9,10 +9,10 @@ import { RouterLink } from '@angular/router';
     <a routerLink="/" class="brand-mark" aria-label="StayWise home">
       <span class="brand-mark__icon">SW</span>
       <span>
-        <strong>StayWise</strong>
-        <small>Hotel Management Suite</small>
+        <strong class="text-xl font-bold">StayWise</strong>
+        <!-- <small>Hotel Management Suite</small> -->
       </span>
     </a>
-  `
+  `,
 })
 export class BrandMarkComponent {}

@@ -12,30 +12,218 @@ import { RoomService } from '../../core/services/room.service';
   imports: [AsyncPipe, CurrencyPipe, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (room$ | async; as room) {
-      <section class="section container">
-        <div class="section-grid">
-          <article class="surface section-panel">
-            <p class="eyebrow">Booking checkout</p>
-            <h1>{{ room.type }}</h1>
-            <p>Confirm dates, guest count, and preferences to create the reservation.</p>
-            <div class="stack-list">
-              <div><strong>Room {{ room.roomNumber }}</strong><span>Floor {{ room.floor }} · {{ room.capacity }} guests</span></div>
-              <div><strong>{{ room.baseRate | currency: 'INR' : 'symbol' : '1.0-0' }}</strong><span>Nightly base rate before taxes and extras</span></div>
+    <div class="animate-fade-in pb-20 pt-8 mt-12 text-left">
+      @if (room$ | async; as room) {
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 lg:gap-20 items-stretch relative z-10">
+            <div class="space-y-8 z-10 pt-4">
+              <div>
+                <div
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-950/5 border border-orange-900/10 mb-4"
+                >
+                  <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                  <p class="eyebrow !m-0 !text-xs text-amber-800">Secure Checkout</p>
+                </div>
+                <h1
+                  class="text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 leading-[1.1]"
+                >
+                  Confirm your <br /><span class="text-amber-700">{{ room.type }}</span>
+                </h1>
+                <p class="mt-4 text-lg text-neutral-600 leading-relaxed max-w-lg">
+                  Confirm your expected dates, guest count, and any particular preferences to
+                  finalize the reservation for this suite.
+                </p>
+              </div>
+
+              <div
+                class="surface relative border border-amber-900/10 shadow-lg rounded-[2rem] overflow-hidden backdrop-blur-xl bg-orange-50/60 p-1"
+              >
+                <div
+                  class="p-6 md:p-8 space-y-6 bg-white/40 rounded-[1.75rem] border border-white/50"
+                >
+                  <div class="flex items-start justify-between gap-4 pb-6 border-b border-black/5">
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                          ></path>
+                          <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">
+                          Unit No.
+                        </p>
+                        <p class="text-xl font-bold text-neutral-900 leading-none">
+                          Room {{ room.roomNumber }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xs font-bold text-neutral-500 mb-1 uppercase tracking-wider">
+                        Capacity
+                      </p>
+                      <p
+                        class="text-sm font-medium text-neutral-600 flex items-center justify-end gap-1.5"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="text-amber-700/70"
+                        >
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="9" cy="7" r="4"></circle>
+                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Floor {{ room.floor }} &middot; {{ room.capacity }} guests
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-4 pt-2">
+                    <div>
+                      <p class="text-sm font-semibold text-neutral-500 mb-1">Base Nightly Rate</p>
+                      <p class="text-xs text-neutral-400">Excludes standard taxes</p>
+                    </div>
+                    <p class="text-3xl font-bold text-neutral-900">
+                      {{ room.baseRate | currency: 'INR' : 'symbol' : '1.0-0' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </article>
-          <form class="surface auth-form" [formGroup]="form" (ngSubmit)="submit()">
-            <label><span>Check-in</span><input type="datetime-local" formControlName="checkIn" /></label>
-            <label><span>Check-out</span><input type="datetime-local" formControlName="checkOut" /></label>
-            <label><span>Guests</span><input type="number" min="1" formControlName="guests" /></label>
-            <label><span>Special requests</span><input type="text" formControlName="specialRequests" /></label>
-            @if (error()) { <p class="error-text">{{ error() }}</p> }
-            <button type="submit" class="button button--full">Create booking</button>
-          </form>
-        </div>
-      </section>
-    }
-  `
+
+            <div class="relative w-full">
+              <div
+                class="absolute -top-10 -right-10 w-72 h-72 bg-amber-600/20 rounded-full blur-[80px] z-0"
+              ></div>
+
+              <form
+                class="surface relative z-10 border border-white/60 shadow-2xl rounded-[2rem] p-6 sm:p-10 backdrop-blur-xl bg-white/80 flex flex-col gap-6"
+                [formGroup]="form"
+                (ngSubmit)="submit()"
+              >
+                <div class="text-center mb-2">
+                  <h2 class="text-2xl font-bold text-neutral-900">Guest Details</h2>
+                </div>
+
+                <div class="grid grid-cols-1 gap-5">
+                  <label class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-neutral-700">Check-in</span>
+                    <input
+                      type="datetime-local"
+                      formControlName="checkIn"
+                      class="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all text-sm"
+                    />
+                  </label>
+
+                  <label class="flex flex-col gap-2">
+                    <span class="text-sm font-semibold text-neutral-700">Check-out</span>
+                    <input
+                      type="datetime-local"
+                      formControlName="checkOut"
+                      class="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all text-sm"
+                    />
+                  </label>
+                </div>
+
+                <label class="flex flex-col gap-2">
+                  <span class="text-sm font-semibold text-neutral-700">Total Guests</span>
+                  <div class="relative">
+                    <input
+                      type="number"
+                      min="1"
+                      formControlName="guests"
+                      class="w-full pl-11 pr-4 py-3 rounded-xl border border-neutral-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all font-medium"
+                    />
+                  </div>
+                </label>
+
+                <label class="flex flex-col gap-2">
+                  <span class="text-sm font-semibold text-neutral-700">Special Requests</span>
+                  <textarea
+                    formControlName="specialRequests"
+                    rows="3"
+                    class="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all resize-none placeholder:text-neutral-400"
+                    placeholder="e.g., quiet room, high floor, anniversary..."
+                  ></textarea>
+                </label>
+
+                @if (error()) {
+                  <div
+                    class="p-3.5 rounded-xl bg-red-50 border border-red-100 flex items-start gap-3"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="text-red-600 shrink-0 mt-0.5"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p class="text-sm font-medium text-red-800 m-0">{{ error() }}</p>
+                  </div>
+                }
+
+                <button
+                  type="submit"
+                  class="button w-full shadow-lg shadow-amber-900/20 hover:scale-[1.02] transition-transform duration-200 py-4 mt-4 flex items-center justify-center gap-2 text-base font-bold bg-neutral-900 hover:bg-neutral-800 border-0"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  Confirm Reservation securely
+                </button>
+                <p class="text-center text-xs text-neutral-400 font-medium">
+                  You will not be charged yet.
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
+      }
+    </div>
+  `,
 })
 export class BookingCheckoutPageComponent {
   private readonly route = inject(ActivatedRoute);
@@ -47,14 +235,14 @@ export class BookingCheckoutPageComponent {
   readonly error = signal('');
   readonly room$ = this.route.paramMap.pipe(
     map((params) => params.get('roomId') ?? ''),
-    switchMap((roomId) => this.roomService.getRoom(roomId))
+    switchMap((roomId) => this.roomService.getRoom(roomId)),
   );
 
   readonly form = this.formBuilder.nonNullable.group({
     checkIn: ['', Validators.required],
     checkOut: ['', Validators.required],
     guests: [1, [Validators.required, Validators.min(1)]],
-    specialRequests: ['']
+    specialRequests: [''],
   });
 
   async submit(): Promise<void> {
@@ -73,8 +261,8 @@ export class BookingCheckoutPageComponent {
           roomId,
           ...this.form.getRawValue(),
           checkIn: new Date(this.form.getRawValue().checkIn).toISOString(),
-          checkOut: new Date(this.form.getRawValue().checkOut).toISOString()
-        })
+          checkOut: new Date(this.form.getRawValue().checkOut).toISOString(),
+        }),
       );
       await this.router.navigate(['/booking/confirmation', booking.id]);
     } catch {

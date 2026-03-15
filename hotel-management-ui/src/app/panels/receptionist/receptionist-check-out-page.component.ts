@@ -5,25 +5,25 @@ import { BehaviorSubject, firstValueFrom, map, switchMap } from 'rxjs';
 import { BookingService } from '../../core/services/booking.service';
 
 @Component({
-  selector: 'app-check-in-page',
+  selector: 'app-receptionist-check-out-page',
   imports: [AsyncPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="section">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Check-in</p>
-          <h1>Verify and check in arriving guests.</h1>
+          <p class="eyebrow">Check-out</p>
+          <h1>Finalize stays and trigger housekeeping turnover.</h1>
         </div>
       </div>
       @if (bookings$ | async; as bookings) {
         <div class="card-grid">
           @for (booking of bookings; track booking.id) {
             <article class="surface review-card">
-              <p class="pill">{{ booking.status }}</p>
+              <p class="pill">{{ booking.paymentStatus }}</p>
               <h3>{{ booking.guest?.name || booking.bookingRef }}</h3>
-              <p>{{ booking.room?.type || 'Room stay' }} · {{ booking.checkIn }}</p>
-              <button type="button" class="button" (click)="checkIn(booking.id)">Perform check-in</button>
+              <p>{{ booking.room?.type || 'Room stay' }} · {{ booking.checkOut }}</p>
+              <button type="button" class="button" (click)="checkOut(booking.id)">Perform check-out</button>
             </article>
           }
         </div>
@@ -33,23 +33,23 @@ import { BookingService } from '../../core/services/booking.service';
     </section>
   `
 })
-export class CheckInPageComponent {
+export class ReceptionistCheckOutPageComponent {
   private readonly bookingService = inject(BookingService);
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
   readonly message = signal('');
   readonly error = signal('');
   readonly bookings$ = this.refresh$.pipe(
-    switchMap(() => this.bookingService.listBookings({ status: 'confirmed' })),
+    switchMap(() => this.bookingService.listBookings({ status: 'checked_in' })),
     map((result) => result.items)
   );
 
-  async checkIn(id: string): Promise<void> {
+  async checkOut(id: string): Promise<void> {
     try {
-      await firstValueFrom(this.bookingService.checkIn(id));
-      this.message.set('Guest checked in successfully.');
+      await firstValueFrom(this.bookingService.checkOut(id));
+      this.message.set('Guest checked out successfully.');
       this.refresh$.next();
     } catch {
-      this.error.set('Unable to complete check-in.');
+      this.error.set('Unable to complete check-out.');
     }
   }
 }

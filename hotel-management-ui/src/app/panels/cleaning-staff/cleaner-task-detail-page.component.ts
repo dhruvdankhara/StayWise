@@ -7,7 +7,7 @@ import { BehaviorSubject, firstValueFrom, map, switchMap, tap } from 'rxjs';
 import { HousekeepingService } from '../../core/services/housekeeping.service';
 
 @Component({
-  selector: 'app-task-detail-page',
+  selector: 'app-cleaner-task-detail-page',
   imports: [AsyncPipe, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -32,7 +32,7 @@ import { HousekeepingService } from '../../core/services/housekeeping.service';
     }
   `
 })
-export class TaskDetailPageComponent {
+export class CleanerTaskDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly housekeepingService = inject(HousekeepingService);
   private readonly formBuilder = inject(FormBuilder);

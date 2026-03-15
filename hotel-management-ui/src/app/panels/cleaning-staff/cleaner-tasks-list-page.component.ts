@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { HousekeepingService } from '../../core/services/housekeeping.service';
 
 @Component({
-  selector: 'app-task-list-page',
+  selector: 'app-cleaner-tasks-list-page',
   imports: [AsyncPipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -31,7 +31,7 @@ import { HousekeepingService } from '../../core/services/housekeeping.service';
     </section>
   `
 })
-export class TaskListPageComponent {
+export class CleanerTasksListPageComponent {
   private readonly housekeepingService = inject(HousekeepingService);
   readonly tasks$ = this.housekeepingService.listTasks();
 }

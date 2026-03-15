@@ -14,16 +14,27 @@ import { GuestProfilePageComponent } from './guest-profile-page.component';
 import { GuestReviewsPageComponent } from './guest-reviews-page.component';
 import { RoomDetailPageComponent } from './room-detail-page.component';
 import { RoomSearchPageComponent } from './room-search-page.component';
+import { PublicLayoutComponent } from '../../layouts/public-layout.component';
 
 export const userRoutes: Routes = [
-  { path: '', component: HomePageComponent },
-  { path: 'rooms', component: RoomSearchPageComponent },
-  { path: 'rooms/:id', component: RoomDetailPageComponent },
-  { path: 'booking/:roomId', component: BookingCheckoutPageComponent, canActivate: [authGuard, roleGuard(['guest'])] },
   {
-    path: 'booking/confirmation/:bookingId',
-    component: BookingConfirmationPageComponent,
-    canActivate: [authGuard, roleGuard(['guest'])]
+    path: '',
+    component: PublicLayoutComponent,
+    children: [
+      { path: '', component: HomePageComponent },
+      { path: 'rooms', component: RoomSearchPageComponent },
+      { path: 'rooms/:id', component: RoomDetailPageComponent },
+      {
+        path: 'booking/:roomId',
+        component: BookingCheckoutPageComponent,
+        canActivate: [authGuard, roleGuard(['guest'])],
+      },
+      {
+        path: 'booking/confirmation/:bookingId',
+        component: BookingConfirmationPageComponent,
+        canActivate: [authGuard, roleGuard(['guest'])],
+      },
+    ],
   },
   {
     path: 'guest',
@@ -35,7 +46,7 @@ export const userRoutes: Routes = [
       { path: 'bookings/:id', component: GuestBookingDetailPageComponent },
       { path: 'profile', component: GuestProfilePageComponent },
       { path: 'reviews', component: GuestReviewsPageComponent },
-      { path: 'issues', component: GuestIssuesPageComponent }
-    ]
-  }
+      { path: 'issues', component: GuestIssuesPageComponent },
+    ],
+  },
 ];

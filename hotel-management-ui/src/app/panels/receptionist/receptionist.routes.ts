@@ -3,12 +3,12 @@ import { Routes } from '@angular/router';
 import { authGuard } from '../../core/guards/auth.guard';
 import { roleGuard } from '../../core/guards/role.guard';
 import { DashboardLayoutComponent } from '../../layouts/dashboard-layout.component';
-import { BillingWorkspacePageComponent } from '../../shared/components/billing-workspace-page.component';
-import { BookingWorkspacePageComponent } from '../../shared/components/booking-workspace-page.component';
-import { CheckInPageComponent } from '../../shared/components/check-in-page.component';
-import { CheckOutPageComponent } from '../../shared/components/check-out-page.component';
-import { GuestManagementPageComponent } from '../../shared/components/guest-management-page.component';
-import { OperationsDashboardPageComponent } from '../../shared/components/operations-dashboard-page.component';
+import { ReceptionistBillingPageComponent } from './receptionist-billing-page.component';
+import { ReceptionistBookingsPageComponent } from './receptionist-bookings-page.component';
+import { ReceptionistCheckInPageComponent } from './receptionist-check-in-page.component';
+import { ReceptionistCheckOutPageComponent } from './receptionist-check-out-page.component';
+import { ReceptionistGuestsPageComponent } from './receptionist-guests-page.component';
+import { ReceptionistDashboardPageComponent } from './receptionist-dashboard-page.component';
 
 export const receptionistRoutes: Routes = [
   {
@@ -18,7 +18,7 @@ export const receptionistRoutes: Routes = [
     children: [
       {
         path: '',
-        component: OperationsDashboardPageComponent,
+        component: ReceptionistDashboardPageComponent,
         data: {
           eyebrow: 'Front desk',
           title: 'Arrivals, departures, and guest servicing.',
@@ -27,17 +27,17 @@ export const receptionistRoutes: Routes = [
       },
       {
         path: 'bookings',
-        component: BookingWorkspacePageComponent,
+        component: ReceptionistBookingsPageComponent,
         data: {
           eyebrow: 'Reservation desk',
           title: 'Manage reservations and guest requests.',
           description: 'Create walk-ins, edit bookings, and capture special stay requirements.'
         }
       },
-      { path: 'check-in', component: CheckInPageComponent },
-      { path: 'check-out', component: CheckOutPageComponent },
-      { path: 'billing', component: BillingWorkspacePageComponent },
-      { path: 'guests', component: GuestManagementPageComponent }
+      { path: 'check-in', component: ReceptionistCheckInPageComponent },
+      { path: 'check-out', component: ReceptionistCheckOutPageComponent },
+      { path: 'billing', component: ReceptionistBillingPageComponent },
+      { path: 'guests', component: ReceptionistGuestsPageComponent }
     ]
   }
 ];

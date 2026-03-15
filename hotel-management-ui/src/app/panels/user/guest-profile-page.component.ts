@@ -8,23 +8,211 @@ import { AuthService } from '../../core/services/auth.service';
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Guest profile</p>
-          <h1>Personal details, preferences, and account identity.</h1>
+    <div class="animate-fade-in relative z-10 max-w-4xl mx-auto pb-12">
+      <section class="mb-10">
+        <p
+          class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
+        >
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+          Guest Profile
+        </p>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 mb-4">
+          Personal details & identity.
+        </h1>
+        <p class="text-lg text-neutral-600 max-w-2xl">
+          Manage your personal information, contact methods, and preferences.
+        </p>
+      </section>
+
+      <form
+        class="surface bg-white/80 backdrop-blur-xl border border-white/60 shadow-xl rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden"
+        [formGroup]="form"
+        (ngSubmit)="submit()"
+      >
+        <!-- Ambient bubble -->
+        <div
+          class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+        ></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+          <div class="md:col-span-2 flex items-center gap-6 pb-8 border-b border-black/5 mb-2">
+            <div
+              class="w-20 h-20 rounded-full bg-orange-50 border border-amber-900/10 flex items-center justify-center text-amber-800 text-2xl font-bold uppercase shadow-sm relative overflow-hidden"
+            >
+              @if (form.get('profileImage')?.value) {
+                <img
+                  [src]="form.get('profileImage')?.value"
+                  alt="Profile"
+                  class="w-full h-full object-cover"
+                />
+              } @else {
+                {{ form.get('name')?.value?.charAt(0) || 'U' }}
+              }
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-neutral-900">
+                {{ form.get('name')?.value || 'Guest User' }}
+              </h3>
+              <p class="text-sm text-neutral-500">Main Account Holder</p>
+            </div>
+          </div>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-neutral-700">Full Name</span>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <input
+                type="text"
+                formControlName="name"
+                class="w-full pl-11 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-neutral-900 outline-none"
+                placeholder="Your full name"
+              />
+            </div>
+          </label>
+
+          <label class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-neutral-700">Phone Number</span>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  ></path>
+                </svg>
+              </div>
+              <input
+                type="tel"
+                formControlName="phone"
+                class="w-full pl-11 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-neutral-900 outline-none"
+                placeholder="+1 (555) 000-0000"
+              />
+            </div>
+          </label>
+
+          <label class="flex flex-col gap-2 md:col-span-2">
+            <span class="text-sm font-semibold text-neutral-700">Profile Image URL</span>
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-neutral-400"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </div>
+              <input
+                type="url"
+                formControlName="profileImage"
+                class="w-full pl-11 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-neutral-900 outline-none"
+                placeholder="https://example.com/avatar.jpg"
+              />
+            </div>
+          </label>
         </div>
-      </div>
-      <form class="surface auth-form" [formGroup]="form" (ngSubmit)="submit()">
-        <label><span>Name</span><input type="text" formControlName="name" /></label>
-        <label><span>Phone</span><input type="tel" formControlName="phone" /></label>
-        <label><span>Profile image URL</span><input type="url" formControlName="profileImage" /></label>
-        @if (message()) { <p>{{ message() }}</p> }
-        @if (error()) { <p class="error-text">{{ error() }}</p> }
-        <button type="submit" class="button button--full">Save profile</button>
+
+        @if (message()) {
+          <div
+            class="mt-6 p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-100 flex items-center gap-3 animate-fade-in"
+          >
+            <div
+              class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <p class="text-sm font-medium m-0">{{ message() }}</p>
+          </div>
+        }
+        @if (error()) {
+          <div
+            class="mt-6 p-4 rounded-2xl bg-red-50 text-red-800 border border-red-100 flex items-center gap-3 animate-fade-in"
+          >
+            <div
+              class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <p class="text-sm font-medium m-0">{{ error() }}</p>
+          </div>
+        }
+
+        <div class="mt-10 pt-8 border-t border-black/5 flex justify-end">
+          <button
+            type="submit"
+            [disabled]="form.invalid"
+            class="button py-3 px-8 text-base bg-amber-800 hover:bg-amber-900 text-white rounded-xl shadow-lg border-0 shadow-amber-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5"
+          >
+            Save Changes
+          </button>
+        </div>
       </form>
-    </section>
-  `
+    </div>
+  `,
 })
 export class GuestProfilePageComponent {
   private readonly authService = inject(AuthService);
@@ -34,7 +222,7 @@ export class GuestProfilePageComponent {
   readonly form = this.formBuilder.nonNullable.group({
     name: [this.authService.user()?.name ?? '', [Validators.required]],
     phone: [this.authService.user()?.phone ?? ''],
-    profileImage: [this.authService.user()?.profileImage ?? '']
+    profileImage: [this.authService.user()?.profileImage ?? ''],
   });
 
   async submit(): Promise<void> {

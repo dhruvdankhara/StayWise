@@ -3,12 +3,12 @@ import { Routes } from '@angular/router';
 import { authGuard } from '../../core/guards/auth.guard';
 import { roleGuard } from '../../core/guards/role.guard';
 import { DashboardLayoutComponent } from '../../layouts/dashboard-layout.component';
-import { BookingWorkspacePageComponent } from '../../shared/components/booking-workspace-page.component';
-import { OperationsDashboardPageComponent } from '../../shared/components/operations-dashboard-page.component';
-import { ReportWorkspacePageComponent } from '../../shared/components/report-workspace-page.component';
-import { RoomWorkspacePageComponent } from '../../shared/components/room-workspace-page.component';
-import { SettingsWorkspacePageComponent } from '../../shared/components/settings-workspace-page.component';
-import { StaffWorkspacePageComponent } from '../../shared/components/staff-workspace-page.component';
+import { AdminBookingsPageComponent } from './admin-bookings-page.component';
+import { AdminDashboardPageComponent } from './admin-dashboard-page.component';
+import { AdminReportsPageComponent } from './admin-reports-page.component';
+import { AdminRoomsPageComponent } from './admin-rooms-page.component';
+import { AdminSettingsPageComponent } from './admin-settings-page.component';
+import { AdminStaffPageComponent } from './admin-staff-page.component';
 
 export const adminRoutes: Routes = [
   {
@@ -18,17 +18,17 @@ export const adminRoutes: Routes = [
     children: [
       {
         path: '',
-        component: OperationsDashboardPageComponent,
+        component: AdminDashboardPageComponent,
         data: {
           eyebrow: 'Administration',
           title: 'Executive control across hotel operations.',
           description: 'Monitor rooms, reservations, and housekeeping throughput from one dashboard.'
         }
       },
-      { path: 'staff', component: StaffWorkspacePageComponent },
+      { path: 'staff', component: AdminStaffPageComponent },
       {
         path: 'rooms',
-        component: RoomWorkspacePageComponent,
+        component: AdminRoomsPageComponent,
         data: {
           eyebrow: 'Inventory control',
           title: 'Room inventory, pricing, and visual merchandising.',
@@ -37,7 +37,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'bookings',
-        component: BookingWorkspacePageComponent,
+        component: AdminBookingsPageComponent,
         data: {
           eyebrow: 'Reservations',
           title: 'Reservation governance and booking interventions.',
@@ -46,7 +46,7 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'reports',
-        component: ReportWorkspacePageComponent,
+        component: AdminReportsPageComponent,
         data: {
           eyebrow: 'Analytics',
           title: 'Occupancy, revenue, staff, and guest reporting.',
@@ -54,7 +54,7 @@ export const adminRoutes: Routes = [
           adminOnly: true
         }
       },
-      { path: 'settings', component: SettingsWorkspacePageComponent }
+      { path: 'settings', component: AdminSettingsPageComponent }
     ]
   }
 ];
