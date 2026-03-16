@@ -8,7 +8,6 @@ export const updateSettingsSchema = z.object({
     contactPhone: z.string().min(8).optional(),
     logoUrl: z.string().url().optional(),
     invoiceFooter: z.string().optional(),
-    taxRate: z.number().min(0).optional(),
     currency: z.string().min(3).max(3).optional(),
     checkInTime: z.string().optional(),
     checkOutTime: z.string().optional()

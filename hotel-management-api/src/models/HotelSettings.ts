@@ -7,7 +7,6 @@ export interface HotelSettingsDocument {
   contactPhone: string;
   logoUrl?: string;
   invoiceFooter: string;
-  taxRate: number;
   currency: string;
   checkInTime: string;
   checkOutTime: string;
@@ -23,7 +22,6 @@ const hotelSettingsSchema = new Schema<HotelSettingsDocument>(
     contactPhone: { type: String, required: true },
     logoUrl: { type: String },
     invoiceFooter: { type: String, default: 'Thank you for choosing StayWise.' },
-    taxRate: { type: Number, default: 18 },
     currency: { type: String, default: 'INR' },
     checkInTime: { type: String, default: '14:00' },
     checkOutTime: { type: String, default: '11:00' }

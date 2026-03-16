@@ -78,6 +78,7 @@ export interface BookingListItem {
   cancellationReason?: string;
   guest?: BookingGuestSummary;
   room?: BookingRoomSummary;
+  createdAt?: Date;
 }
 
 export interface InvoiceLineItem {
@@ -93,8 +94,6 @@ export interface Invoice {
   guestId: string;
   lineItems: InvoiceLineItem[];
   subtotal: number;
-  taxRate: number;
-  taxAmount: number;
   discount: number;
   discountReason?: string;
   total: number;
@@ -133,7 +132,6 @@ export interface HotelSettings {
   contactPhone: string;
   logoUrl?: string;
   invoiceFooter: string;
-  taxRate: number;
   currency: string;
   checkInTime: string;
   checkOutTime: string;

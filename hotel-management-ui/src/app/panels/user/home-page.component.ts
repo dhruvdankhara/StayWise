@@ -146,7 +146,7 @@ import { combineLatest } from 'rxjs';
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Check-out {{ vm.settings.checkOutTime }} &middot; Tax {{ vm.settings.taxRate }}%
+                    Check-out {{ vm.settings.checkOutTime }} 
                   </span>
                 </div>
               </div>
@@ -201,7 +201,7 @@ import { combineLatest } from 'rxjs';
                   <div
                     class="absolute inset-0 bg-neutral-100 flex items-center justify-center text-neutral-300"
                   >
-                    <svg
+                    <!--  <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="48"
                       height="48"
@@ -215,7 +215,12 @@ import { combineLatest } from 'rxjs';
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                       <circle cx="8.5" cy="8.5" r="1.5"></circle>
                       <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg>
+                    </svg> -->
+                    <img
+                      [src]="room.images[0]"
+                      alt="{{ room.type }}"
+                      class="object-cover w-full h-full"
+                    />
                   </div>
                   <div class="absolute top-4 left-4">
                     <span

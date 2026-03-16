@@ -12,8 +12,6 @@ export interface InvoiceDocument {
   guest: Types.ObjectId;
   lineItems: InvoiceLineItem[];
   subtotal: number;
-  taxRate: number;
-  taxAmount: number;
   discount: number;
   discountReason?: string;
   total: number;
@@ -37,8 +35,6 @@ const invoiceSchema = new Schema<InvoiceDocument>(
       }
     ],
     subtotal: { type: Number, required: true, min: 0 },
-    taxRate: { type: Number, required: true, min: 0 },
-    taxAmount: { type: Number, required: true, min: 0 },
     discount: { type: Number, default: 0, min: 0 },
     discountReason: { type: String },
     total: { type: Number, required: true, min: 0 },

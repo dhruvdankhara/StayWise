@@ -10,7 +10,6 @@ const defaultSettings = {
   contactEmail: 'hello@staywise.com',
   contactPhone: '+91 98765 43210',
   invoiceFooter: 'Thank you for choosing StayWise.',
-  taxRate: 18,
   currency: 'INR',
   checkInTime: '14:00',
   checkOutTime: '11:00'

@@ -38,7 +38,6 @@ const seed = async (): Promise<void> => {
     contactEmail: 'hello@staywise.com',
     contactPhone: '+91 98765 43210',
     invoiceFooter: 'Thank you for choosing StayWise.',
-    taxRate: 18,
     currency: 'INR',
     checkInTime: '14:00',
     checkOutTime: '11:00'
@@ -112,7 +111,6 @@ const seed = async (): Promise<void> => {
   await upsertInvoice({
     bookingId: activeBooking.id,
     lineItems: [{ description: 'Deluxe room stay', quantity: 2, unitPrice: 7200 }],
-    taxRate: 18,
     discount: 500,
     discountReason: 'Loyalty guest'
   });

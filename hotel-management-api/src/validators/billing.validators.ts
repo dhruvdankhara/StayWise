@@ -11,7 +11,6 @@ export const invoiceSchema = z.object({
         })
       )
       .min(1),
-    taxRate: z.number().min(0),
     discount: z.number().min(0).default(0),
     discountReason: z.string().optional()
   }),

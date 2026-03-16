@@ -15,7 +15,7 @@ const envSchema = z.object({
   SMTP_SECURE: z
     .string()
     .transform((value) => value === 'true')
-    .default('false'),
+    .default(false),
   SMTP_USER: z.string().default(''),
   SMTP_PASS: z.string().default(''),
   MAIL_FROM: z.string().email().default('staywise@example.com'),

@@ -10,7 +10,6 @@ const toTotal = (quantity: number, unitPrice: number): number => quantity * unit
 export const upsertInvoice = async (input: {
   bookingId: string;
   lineItems: Array<{ description: string; quantity: number; unitPrice: number }>;
-  taxRate: number;
   discount: number;
   discountReason?: string;
 }): Promise<InvoiceDocument | null> => {
@@ -26,8 +25,8 @@ export const upsertInvoice = async (input: {
   }));
 
   const subtotal = normalizedLineItems.reduce((sum, item) => sum + item.total, 0);
-  const taxAmount = (subtotal * input.taxRate) / 100;
-  const total = Math.max(0, subtotal + taxAmount - input.discount);
+  
+  const total = Math.max(0, subtotal - input.discount);
 
   const invoice = await InvoiceModel.findOneAndUpdate(
     { booking: new Types.ObjectId(input.bookingId) },
@@ -36,8 +35,6 @@ export const upsertInvoice = async (input: {
       guest: booking.guest,
       lineItems: normalizedLineItems,
       subtotal,
-      taxRate: input.taxRate,
-      taxAmount,
       discount: input.discount,
       discountReason: input.discountReason,
       total
@@ -48,7 +45,4 @@ export const upsertInvoice = async (input: {
   return invoice;
 };
 
-export const getDefaultTaxRate = async (): Promise<number> => {
-  const settings = await HotelSettingsModel.findOne();
-  return settings?.taxRate ?? 18;
-};
+

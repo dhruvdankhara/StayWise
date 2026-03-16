@@ -22,8 +22,7 @@ import { SettingsService } from '../../core/services/settings.service';
           Hotel Settings
         </h1>
         <p class="text-lg text-neutral-600 max-w-2xl leading-relaxed">
-          Manage your hotel's profile, contact details, tax rules, and invoice configurations
-          globally.
+          Manage your hotel's profile, contact details, and invoice configurations globally.
         </p>
       </section>
 
@@ -148,16 +147,6 @@ import { SettingsService } from '../../core/services/settings.service';
             </div>
 
             <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Tax Rate (%)</span
-                >
-                <input
-                  type="number"
-                  formControlName="taxRate"
-                  class="w-full px-4 py-3 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none font-bold text-amber-900"
-                />
-              </label>
               <label class="flex flex-col gap-1.5">
                 <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
                   >Base Currency</span
@@ -285,7 +274,7 @@ export class AdminSettingsPageComponent {
     contactPhone: ['', Validators.required],
     logoUrl: [''],
     invoiceFooter: [''],
-    taxRate: [18, Validators.required],
+
     currency: ['INR', Validators.required],
     checkInTime: ['14:00', Validators.required],
     checkOutTime: ['11:00', Validators.required],

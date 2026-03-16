@@ -104,7 +104,7 @@ import { RoomService } from '../../core/services/room.service';
                   <div class="flex items-center justify-between gap-4 pt-2">
                     <div>
                       <p class="text-sm font-semibold text-neutral-500 mb-1">Base Nightly Rate</p>
-                      <p class="text-xs text-neutral-400">Excludes standard taxes</p>
+                      
                     </div>
                     <p class="text-3xl font-bold text-neutral-900">
                       {{ room.baseRate | currency: 'INR' : 'symbol' : '1.0-0' }}

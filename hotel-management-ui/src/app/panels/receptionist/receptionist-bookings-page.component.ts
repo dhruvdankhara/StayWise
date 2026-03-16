@@ -1,29 +1,27 @@
-import { AsyncPipe, CurrencyPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { AsyncPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, firstValueFrom, map, switchMap } from 'rxjs';
 
+import { BillingService } from '../../core/services/billing.service';
 import { BookingService } from '../../core/services/booking.service';
+import { GuestService, GuestItem } from '../../core/services/guest.service';
+import { RoomService } from '../../core/services/room.service';
+import { RoomListItem } from '../../core/models/app.models';
 
 @Component({
   selector: 'app-receptionist-bookings-page',
-  imports: [AsyncPipe, CurrencyPipe, ReactiveFormsModule],
+  imports: [AsyncPipe, ReactiveFormsModule, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto">
+    <div class="animate-fade-in relative z-10 max-w-400 mx-auto">
       <section class="mb-8 lg:mb-12">
         <p
           class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
         >
           <span class="w-2 h-2 rounded-full bg-amber-500"></span>
           {{ title().eyebrow }}
-        </p>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 mb-4">
-          {{ title().title }}
-        </h1>
-        <p class="text-lg text-neutral-600 max-w-2xl leading-relaxed">
-          {{ title().description }}
         </p>
       </section>
 
@@ -66,24 +64,34 @@ import { BookingService } from '../../core/services/booking.service';
             <div class="flex flex-col gap-5 relative z-10">
               <label class="flex flex-col gap-1.5">
                 <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Guest ID</span
+                  >Guest</span
                 >
-                <input
-                  type="text"
+                <select
                   formControlName="guestId"
                   class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
+                >
+                  <option value="" disabled selected>Select a guest...</option>
+                  @for (guest of guests(); track guest._id) {
+                    <option [value]="guest._id">{{ guest.name }} ({{ guest.email }})</option>
+                  }
+                </select>
               </label>
 
               <label class="flex flex-col gap-1.5">
                 <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Room ID</span
+                  >Room</span
                 >
-                <input
-                  type="text"
+                <select
                   formControlName="roomId"
                   class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
+                >
+                  <option value="" disabled selected>Select a room...</option>
+                  @for (room of rooms(); track room.id) {
+                    <option [value]="room.id">
+                      {{ room.roomNumber }} - {{ room.type }} ({{ room.capacity }} persons)
+                    </option>
+                  }
+                </select>
               </label>
 
               <div class="grid grid-cols-2 gap-4">
@@ -249,7 +257,12 @@ import { BookingService } from '../../core/services/booking.service';
                       <th
                         class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
                       >
-                        Room
+                        Room No/Type
+                      </th>
+                      <th
+                        class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
+                      >
+                        Check-in / Check-out
                       </th>
                       <th
                         class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
@@ -281,7 +294,12 @@ import { BookingService } from '../../core/services/booking.service';
                           >
                         </td>
                         <td class="py-4 px-6 text-sm text-neutral-600 font-medium">
+                          {{ booking.room?.roomNumber }} -
                           {{ booking.room?.type || booking.room?.id || 'Room' }}
+                        </td>
+                        <td class="py-4 px-6 text-sm text-neutral-600">
+                          {{ booking.checkIn | date: 'short' }} <br />
+                          {{ booking.checkOut | date: 'short' }}
                         </td>
                         <td class="py-4 px-6">
                           <span
@@ -300,8 +318,9 @@ import { BookingService } from '../../core/services/booking.service';
                             {{ booking.status }}
                           </span>
                         </td>
-                        <td class="py-4 px-6 text-sm font-bold text-neutral-900">
-                          {{ booking.totalAmount | currency: 'INR' : 'symbol' : '1.0-0' }}
+
+                        <td class="py-4 px-6 text-sm text-neutral-600">
+                          {{ booking.createdAt | date: 'short' }}
                         </td>
                         <td class="py-4 px-6">
                           <div class="flex items-center justify-end gap-2">
@@ -372,15 +391,21 @@ import { BookingService } from '../../core/services/booking.service';
     </div>
   `,
 })
-export class ReceptionistBookingsPageComponent {
+export class ReceptionistBookingsPageComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
   private readonly route = inject(ActivatedRoute);
+  private readonly billingService = inject(BillingService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly guestService = inject(GuestService);
+  private readonly roomService = inject(RoomService);
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
 
   readonly message = signal('');
   readonly error = signal('');
   readonly editingId = signal<string | null>(null);
+
+  readonly guests = signal<GuestItem[]>([]);
+  readonly rooms = signal<RoomListItem[]>([]);
   readonly form = this.formBuilder.nonNullable.group({
     guestId: ['', Validators.required],
     roomId: ['', Validators.required],
@@ -397,6 +422,19 @@ export class ReceptionistBookingsPageComponent {
     switchMap(() => this.bookingService.listBookings()),
     map((result) => result.items),
   );
+
+  async ngOnInit(): Promise<void> {
+    try {
+      const [guestsRes, roomsRes] = await Promise.all([
+        firstValueFrom(this.guestService.listGuests()),
+        firstValueFrom(this.roomService.listRooms({ limit: 100 })),
+      ]);
+      this.guests.set(guestsRes);
+      this.rooms.set(roomsRes);
+    } catch (e) {
+      console.error('Failed to load form dependencies:', e);
+    }
+  }
 
   async save(): Promise<void> {
     this.error.set('');
