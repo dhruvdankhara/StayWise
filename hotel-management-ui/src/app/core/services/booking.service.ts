@@ -2,34 +2,52 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
 import { mapBooking } from '../models/api-helpers';
-import type { BookingListItem, PagedResult } from '../models/app.models';
+import type { BookingListItem, BookingPaymentMethod, PagedResult } from '../models/app.models';
 import { ApiService } from './api.service';
+
+export interface CreateBookingPayload {
+  guestId?: string;
+  roomId: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  specialRequests?: string;
+  paymentMethod: BookingPaymentMethod;
+}
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
   private readonly api = inject(ApiService);
 
-  listBookings(filters?: Record<string, string | number>): Observable<PagedResult<BookingListItem>> {
-    return this.api.get<{ items: Record<string, unknown>[]; page: number; limit: number; total: number }>(
-      '/bookings',
-      filters
-    ).pipe(
-      map((result) => ({
-        ...result,
-        items: result.items.map(mapBooking)
-      }))
-    );
+  listBookings(
+    filters?: Record<string, string | number>,
+  ): Observable<PagedResult<BookingListItem>> {
+    return this.api
+      .get<{
+        items: Record<string, unknown>[];
+        page: number;
+        limit: number;
+        total: number;
+      }>('/bookings', filters)
+      .pipe(
+        map((result) => ({
+          ...result,
+          items: result.items.map(mapBooking),
+        })),
+      );
   }
 
   listMyBookings(): Observable<BookingListItem[]> {
-    return this.api.get<Record<string, unknown>[]>('/bookings/my').pipe(map((items) => items.map(mapBooking)));
+    return this.api
+      .get<Record<string, unknown>[]>('/bookings/my')
+      .pipe(map((items) => items.map(mapBooking)));
   }
 
   getBooking(id: string): Observable<BookingListItem> {
     return this.api.get<Record<string, unknown>>(`/bookings/${id}`).pipe(map(mapBooking));
   }
 
-  createBooking(payload: Record<string, unknown>): Observable<BookingListItem> {
+  createBooking(payload: CreateBookingPayload): Observable<BookingListItem> {
     return this.api.post<Record<string, unknown>>('/bookings', payload).pipe(map(mapBooking));
   }
 
@@ -38,14 +56,20 @@ export class BookingService {
   }
 
   cancelBooking(id: string, reason: string): Observable<BookingListItem> {
-    return this.api.post<Record<string, unknown>>(`/bookings/${id}/cancel`, { reason }).pipe(map(mapBooking));
+    return this.api
+      .post<Record<string, unknown>>(`/bookings/${id}/cancel`, { reason })
+      .pipe(map(mapBooking));
   }
 
   checkIn(id: string): Observable<BookingListItem> {
-    return this.api.post<Record<string, unknown>>(`/bookings/${id}/checkin`, {}).pipe(map(mapBooking));
+    return this.api
+      .post<Record<string, unknown>>(`/bookings/${id}/checkin`, {})
+      .pipe(map(mapBooking));
   }
 
   checkOut(id: string): Observable<BookingListItem> {
-    return this.api.post<Record<string, unknown>>(`/bookings/${id}/checkout`, {}).pipe(map(mapBooking));
+    return this.api
+      .post<Record<string, unknown>>(`/bookings/${id}/checkout`, {})
+      .pipe(map(mapBooking));
   }
 }

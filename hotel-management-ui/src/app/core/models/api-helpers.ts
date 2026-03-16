@@ -70,6 +70,9 @@ export const mapBooking = (value: Record<string, unknown>): BookingListItem => (
   actualCheckOut: value['actualCheckOut'] ? String(value['actualCheckOut']) : undefined,
   guests: Number(value['guests'] ?? 0),
   status: String(value['status'] ?? ''),
+  paymentMethod: value['paymentMethod']
+    ? (String(value['paymentMethod']) as BookingListItem['paymentMethod'])
+    : undefined,
   totalAmount: Number(value['totalAmount'] ?? 0),
   paymentStatus: String(value['paymentStatus'] ?? ''),
   specialRequests: value['specialRequests'] ? String(value['specialRequests']) : undefined,
@@ -82,6 +85,8 @@ export const mapBooking = (value: Record<string, unknown>): BookingListItem => (
     value['room'] && typeof value['room'] === 'object'
       ? mapRoomSummary(value['room'] as Record<string, unknown>)
       : undefined,
+  createdAt: value['createdAt'] ? String(value['createdAt']) : undefined,
+  updatedAt: value['updatedAt'] ? String(value['updatedAt']) : undefined,
 });
 
 export const mapInvoice = (value: Record<string, unknown>): Invoice => ({

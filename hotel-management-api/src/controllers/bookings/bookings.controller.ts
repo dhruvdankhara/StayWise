@@ -112,6 +112,13 @@ export const createBooking = asyncHandler(
       checkOut,
     );
 
+    if (request.body.paymentMethod === "online") {
+      throw new AppError(
+        400,
+        "Online payments must use /api/billing/online/order and /api/billing/online/verify",
+      );
+    }
+
     const booking = await BookingModel.create({
       bookingRef: generateBookingReference(),
       guest: new Types.ObjectId(guestId),
@@ -119,7 +126,8 @@ export const createBooking = asyncHandler(
       checkIn,
       checkOut,
       guests: request.body.guests,
-      status: request.user?.role === "guest" ? "pending" : "confirmed",
+      status: "confirmed",
+      paymentMethod: request.body.paymentMethod,
       totalAmount,
       paymentStatus: "unpaid",
       specialRequests: request.body.specialRequests,

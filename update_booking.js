@@ -1,4 +1,5 @@
-import { AsyncPipe, CurrencyPipe, DatePipe } from '@angular/common';
+const fs = require('fs');
+const content = import { AsyncPipe, CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -12,7 +13,7 @@ import { ReviewService } from '../../core/services/review.service';
   selector: 'app-guest-booking-detail-page',
   imports: [AsyncPipe, CurrencyPipe, DatePipe, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
+  template: \\\
     <div class="animate-fade-in pb-20 pt-6 text-left relative overflow-hidden min-h-screen">
       <!-- Ambient Background -->
       <div class="fixed inset-0 -z-10 pointer-events-none bg-neutral-50/50">
@@ -21,7 +22,7 @@ import { ReviewService } from '../../core/services/review.service';
         <div class="absolute -bottom-[10%] left-[20%] w-[60%] h-[50%] rounded-full bg-rose-500/10 blur-[120px]"></div>
       </div>
 
-      @if (booking$ | async; as booking) {
+      @if (booking\\$ | async; as booking) {
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <!-- Header Card -->
           <header class="mb-8 relative flex flex-col md:flex-row md:items-end justify-between gap-6 rounded-[2.5rem] border border-white/60 bg-white/70 backdrop-blur-2xl p-6 md:p-10 shadow-xl shadow-amber-900/5">
@@ -34,7 +35,7 @@ import { ReviewService } from '../../core/services/review.service';
                 <span class="text-xs font-bold text-amber-800 tracking-wide uppercase">Booking Detail</span>
               </div>
               <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-900 flex items-center gap-4">
-                Ref: <span class="text-amber-600 font-mono bg-amber-50/50 px-4 py-1 rounded-2xl border border-amber-100/50">{{ booking.bookingRef }}</span>
+                Ref: <span class="text-amber-600 font-mono bg-amber-50/50 px-4 py-1 rounded-2xl border border-amber-100/50">\\</span>
               </h1>
             </div>
 
@@ -49,7 +50,7 @@ import { ReviewService } from '../../core/services/review.service';
                   class="w-2 h-2 rounded-full bg-neutral-400"
                   [class.bg-emerald-500]="isValue(booking.status, 'confirmed')"
                 ></span>
-                {{ asLabel(booking.status) }}
+                \\
               </span>
               <span
                 class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-200 text-neutral-700 text-sm font-bold uppercase tracking-wider rounded-xl shadow-sm transition-colors"
@@ -61,7 +62,7 @@ import { ReviewService } from '../../core/services/review.service';
                   class="w-2 h-2 rounded-full bg-neutral-400"
                   [class.bg-emerald-500]="isValue(booking.paymentStatus, 'paid')"
                 ></span>
-                {{ asLabel(booking.paymentStatus) }} Payment
+                \\ Payment
               </span>
             </div>
           </header>
@@ -83,16 +84,16 @@ import { ReviewService } from '../../core/services/review.service';
                       <div>
                         <p class="text-xs font-bold text-neutral-400 mb-1.5 uppercase tracking-widest">Room Assigned</p>
                         <h2 class="text-3xl font-extrabold text-neutral-900 mb-2">
-                          {{ booking.room?.type || 'Standard Room' }}
+                          \\
                         </h2>
                         <div class="flex flex-wrap items-center gap-3">
                           <p class="inline-flex text-neutral-700 font-semibold items-center gap-1.5 bg-white px-3 py-1 rounded-lg border border-neutral-200/60 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                            Room {{ booking.room?.roomNumber || 'TBD' }}
+                            Room \\
                           </p>
                           <p class="inline-flex text-neutral-700 font-semibold items-center gap-1.5 bg-white px-3 py-1 rounded-lg border border-neutral-200/60 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                            {{ booking.guests }} Guest{{ booking.guests > 1 ? 's' : '' }}
+                            \\ Guest\\
                           </p>
                         </div>
                       </div>
@@ -111,12 +112,12 @@ import { ReviewService } from '../../core/services/review.service';
                         <div class="relative">
                           <span class="absolute -left-[11px] top-2 w-2 h-2 rounded-full bg-orange-400"></span>
                           <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-1">Check-in</p>
-                          <p class="text-lg text-neutral-900 font-extrabold">{{ booking.checkIn | date: 'mediumDate' }}</p>
+                          <p class="text-lg text-neutral-900 font-extrabold">\\</p>
                         </div>
                         <div class="relative pt-2">
                           <span class="absolute -left-[11px] top-4 w-2 h-2 rounded-full bg-orange-400"></span>
                           <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-1">Check-out</p>
-                          <p class="text-lg text-neutral-900 font-extrabold">{{ booking.checkOut | date: 'mediumDate' }}</p>
+                          <p class="text-lg text-neutral-900 font-extrabold">\\</p>
                         </div>
                       </div>
                     </div>
@@ -130,7 +131,7 @@ import { ReviewService } from '../../core/services/review.service';
                       </div>
                       <div class="ml-2">
                         <p class="text-4xl text-neutral-900 font-black tracking-tight drop-shadow-sm">
-                          {{ booking.totalAmount | currency: 'INR' : 'symbol' : '1.0-0' }}
+                          \\
                         </p>
                       </div>
                     </div>
@@ -145,23 +146,23 @@ import { ReviewService } from '../../core/services/review.service';
                       <!-- Info Cards -->
                       <div class="bg-white/50 border border-neutral-200/60 rounded-2xl p-5 flex flex-col justify-center transition-colors hover:bg-white">
                         <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Guest Name</span>
-                        <span class="text-neutral-800 font-bold truncate text-lg">{{ booking.guest?.name || 'Guest' }}</span>
+                        <span class="text-neutral-800 font-bold truncate text-lg">\\</span>
                       </div>
                       <div class="bg-white/50 border border-neutral-200/60 rounded-2xl p-5 flex flex-col justify-center transition-colors hover:bg-white">
                         <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Email Address</span>
-                        <span class="text-neutral-800 font-bold truncate text-lg">{{ booking.guest?.email || '-' }}</span>
+                        <span class="text-neutral-800 font-bold truncate text-lg">\\</span>
                       </div>
                       <div class="bg-white/50 border border-neutral-200/60 rounded-2xl p-5 flex flex-col justify-center transition-colors hover:bg-white">
                         <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Payment Method</span>
-                        <span class="text-neutral-800 font-bold truncate text-lg">{{ asLabel(booking.paymentMethod || '-') }}</span>
+                        <span class="text-neutral-800 font-bold truncate text-lg">\\</span>
                       </div>
                       <div class="bg-white/50 border border-neutral-200/60 rounded-2xl p-5 flex flex-col justify-center transition-colors hover:bg-white">
                         <span class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">Booking ID</span>
-                        <span class="text-neutral-600 font-bold truncate font-mono text-sm">{{ booking.id || '-' }}</span>
+                        <span class="text-neutral-600 font-bold truncate font-mono text-sm">\\</span>
                       </div>
                       <div class="sm:col-span-2 bg-amber-50/30 border border-amber-100 rounded-2xl p-5 flex flex-col justify-center transition-colors hover:bg-amber-50/60">
                         <span class="text-xs font-bold text-amber-600/70 uppercase tracking-wider mb-1">Special Requests</span>
-                        <span class="text-neutral-800 font-semibold whitespace-pre-wrap">{{ booking.specialRequests || 'No special requests submitted.' }}</span>
+                        <span class="text-neutral-800 font-semibold whitespace-pre-wrap">\\</span>
                       </div>
                     </div>
                   </div>
@@ -251,14 +252,14 @@ import { ReviewService } from '../../core/services/review.service';
                 @if (message()) {
                   <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 relative z-10">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 shrink-0 mt-0.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <p class="text-sm font-bold text-emerald-800 m-0">{{ message() }}</p>
+                    <p class="text-sm font-bold text-emerald-800 m-0">\\</p>
                   </div>
                 }
 
                 @if (error()) {
                   <div class="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3 relative z-10">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <p class="text-sm font-bold text-red-800 m-0">{{ error() }}</p>
+                    <p class="text-sm font-bold text-red-800 m-0">\\</p>
                   </div>
                 }
 
@@ -276,7 +277,7 @@ import { ReviewService } from '../../core/services/review.service';
         </section>
       }
     </div>
-  `,
+  \\\,
 })
 export class GuestBookingDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
@@ -291,7 +292,7 @@ export class GuestBookingDetailPageComponent {
     rating: 5,
     comment: '',
   });
-  readonly booking$ = this.route.paramMap.pipe(
+  readonly booking\\$ = this.route.paramMap.pipe(
     map((params) => params.get('id') ?? ''),
     switchMap((bookingId) => this.bookingService.getBooking(bookingId)),
   );
@@ -306,7 +307,7 @@ export class GuestBookingDetailPageComponent {
       return '-';
     }
 
-    return cleaned.replace(/\b\w/g, (letter) => letter.toUpperCase());
+    return cleaned.replace(/\\b\\w/g, (letter) => letter.toUpperCase());
   }
 
   async cancel(bookingId: string): Promise<void> {
@@ -350,3 +351,6 @@ export class GuestBookingDetailPageComponent {
     }
   }
 }
+;
+fs.writeFileSync('d:/StayWise/hotel-management-ui/src/app/panels/user/guest-booking-detail-page.component.ts', content);
+console.log('done');

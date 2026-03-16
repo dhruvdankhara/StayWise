@@ -1,6 +1,13 @@
-import { Schema, Types, model } from 'mongoose';
+import { Schema, Types, model } from "mongoose";
 
-import { bookingStatuses, paymentStatuses, type BookingStatus, type PaymentStatus } from '../constants/enums';
+import {
+  bookingStatuses,
+  paymentMethods,
+  paymentStatuses,
+  type BookingStatus,
+  type PaymentMethod,
+  type PaymentStatus,
+} from "../constants/enums";
 
 export interface BookingDocument {
   bookingRef: string;
@@ -12,6 +19,7 @@ export interface BookingDocument {
   actualCheckOut?: Date;
   guests: number;
   status: BookingStatus;
+  paymentMethod: PaymentMethod;
   totalAmount: number;
   paymentStatus: PaymentStatus;
   specialRequests?: string;
@@ -24,21 +32,22 @@ export interface BookingDocument {
 const bookingSchema = new Schema<BookingDocument>(
   {
     bookingRef: { type: String, required: true, unique: true },
-    guest: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    room: { type: Schema.Types.ObjectId, ref: 'Room', required: true },
+    guest: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    room: { type: Schema.Types.ObjectId, ref: "Room", required: true },
     checkIn: { type: Date, required: true },
     checkOut: { type: Date, required: true },
     actualCheckIn: { type: Date },
     actualCheckOut: { type: Date },
     guests: { type: Number, required: true, min: 1 },
-    status: { type: String, enum: bookingStatuses, default: 'pending' },
+    status: { type: String, enum: bookingStatuses, default: "pending" },
+    paymentMethod: { type: String, enum: paymentMethods, required: true },
     totalAmount: { type: Number, required: true, min: 0 },
-    paymentStatus: { type: String, enum: paymentStatuses, default: 'unpaid' },
+    paymentStatus: { type: String, enum: paymentStatuses, default: "unpaid" },
     specialRequests: { type: String },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    cancellationReason: { type: String }
+    createdBy: { type: Schema.Types.ObjectId, ref: "User" },
+    cancellationReason: { type: String },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const BookingModel = model<BookingDocument>('Booking', bookingSchema);
+export const BookingModel = model<BookingDocument>("Booking", bookingSchema);

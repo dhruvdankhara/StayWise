@@ -1,4 +1,5 @@
 export type UserRole = 'admin' | 'hotel_manager' | 'receptionist' | 'cleaning_staff' | 'guest';
+export type BookingPaymentMethod = 'cash' | 'online';
 
 export interface ApiEnvelope<T> {
   success: boolean;
@@ -72,13 +73,15 @@ export interface BookingListItem {
   actualCheckOut?: string;
   guests: number;
   status: string;
+  paymentMethod?: BookingPaymentMethod;
   totalAmount: number;
   paymentStatus: string;
   specialRequests?: string;
   cancellationReason?: string;
   guest?: BookingGuestSummary;
   room?: BookingRoomSummary;
-  createdAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface InvoiceLineItem {
@@ -141,6 +144,30 @@ export interface UploadResult {
   url: string;
   filename?: string;
   size?: number;
+}
+
+export interface CreateOnlineOrderPayload {
+  guestId?: string;
+  roomId: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  specialRequests?: string;
+}
+
+export interface OnlineOrderResult {
+  sessionId: string;
+  razorpayOrderId: string;
+  amount: number;
+  currency: string;
+  keyId: string;
+}
+
+export interface VerifyOnlinePaymentPayload {
+  sessionId: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
 }
 
 export interface NavItem {

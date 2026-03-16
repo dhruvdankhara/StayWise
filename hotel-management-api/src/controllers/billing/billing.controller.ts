@@ -1,9 +1,20 @@
+import crypto from "crypto";
 import type { Request, Response } from "express";
+import { Types } from "mongoose";
 
+import { env } from "../../config/env";
+import { razorpayClient } from "../../config/razorpay";
 import { BookingModel } from "../../models/Booking";
 import { InvoiceModel } from "../../models/Invoice";
+import { PaymentSessionModel } from "../../models/PaymentSession";
 import { PaymentTransactionModel } from "../../models/PaymentTransaction";
 import { HotelSettingsModel } from "../../models/HotelSettings";
+import { createAuditLog } from "../../services/audit.service";
+import {
+  calculateBookingAmount,
+  ensureRoomAvailability,
+  generateBookingReference,
+} from "../../services/booking.service";
 import { buildPdfBuffer } from "../../services/pdf.service";
 import { upsertInvoice } from "../../services/invoice.service";
 import { sendSuccess } from "../../utils/api";
@@ -34,6 +45,23 @@ const getGuestName = (guest: unknown): string => {
   }
 
   return "";
+};
+
+const toPaise = (amount: number): number => Math.round(amount * 100);
+
+const resolveGuestId = (request: Request): string => {
+  if (request.user?.role === "guest") {
+    return request.user.id;
+  }
+
+  if (!request.body.guestId) {
+    throw new AppError(
+      400,
+      "guestId is required for staff-initiated online payment",
+    );
+  }
+
+  return String(request.body.guestId);
 };
 
 export const getInvoice = asyncHandler(
@@ -139,6 +167,195 @@ export const recordPayment = asyncHandler(
       response,
       { invoice, transaction, paymentStatus: booking.paymentStatus },
       "Payment recorded",
+    );
+  },
+);
+
+export const createOnlineOrder = asyncHandler(
+  async (request: Request, response: Response) => {
+    if (!razorpayClient || !env.RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
+      throw new AppError(503, "Online payment is not configured");
+    }
+
+    const guestId = resolveGuestId(request);
+    const checkIn = new Date(request.body.checkIn);
+    const checkOut = new Date(request.body.checkOut);
+
+    if (checkOut <= checkIn) {
+      throw new AppError(400, "Check-out must be after check-in");
+    }
+
+    await ensureRoomAvailability(
+      String(request.body.roomId),
+      checkIn,
+      checkOut,
+    );
+
+    const totalAmount = await calculateBookingAmount(
+      String(request.body.roomId),
+      checkIn,
+      checkOut,
+    );
+
+    const order = await razorpayClient.orders.create({
+      amount: toPaise(totalAmount),
+      currency: "INR",
+      receipt: `sw-${Date.now().toString(36)}`,
+    });
+
+    const session = await PaymentSessionModel.create({
+      actor: request.user?.id ? new Types.ObjectId(request.user.id) : undefined,
+      guest: new Types.ObjectId(guestId),
+      room: new Types.ObjectId(String(request.body.roomId)),
+      checkIn,
+      checkOut,
+      guests: request.body.guests,
+      specialRequests: request.body.specialRequests,
+      amount: totalAmount,
+      currency: "INR",
+      provider: "razorpay",
+      providerOrderId: order.id,
+      status: "created",
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      metadata: {
+        role: request.user?.role,
+      },
+    });
+
+    sendSuccess(
+      response,
+      {
+        sessionId: session.id,
+        razorpayOrderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: env.RAZORPAY_KEY_ID,
+      },
+      "Online payment order created",
+      201,
+    );
+  },
+);
+
+export const verifyOnlinePayment = asyncHandler(
+  async (request: Request, response: Response) => {
+    const session = await PaymentSessionModel.findById(request.body.sessionId);
+
+    if (!session) {
+      throw new AppError(404, "Payment session not found");
+    }
+
+    if (session.status !== "created") {
+      throw new AppError(400, "Payment session is not active");
+    }
+
+    if (session.expiresAt.getTime() < Date.now()) {
+      session.status = "expired";
+      await session.save();
+      throw new AppError(400, "Payment session has expired");
+    }
+
+    if (session.providerOrderId !== request.body.razorpayOrderId) {
+      throw new AppError(400, "Order mismatch for payment session");
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", env.RAZORPAY_KEY_SECRET)
+      .update(
+        `${request.body.razorpayOrderId}|${request.body.razorpayPaymentId}`,
+      )
+      .digest("hex");
+
+    if (expectedSignature !== request.body.razorpaySignature) {
+      session.status = "failed";
+      await session.save();
+      throw new AppError(400, "Invalid payment signature");
+    }
+
+    await ensureRoomAvailability(
+      String(session.room),
+      session.checkIn,
+      session.checkOut,
+    );
+
+    const amount = await calculateBookingAmount(
+      String(session.room),
+      session.checkIn,
+      session.checkOut,
+    );
+
+    const booking = await BookingModel.create({
+      bookingRef: generateBookingReference(),
+      guest: session.guest,
+      room: session.room,
+      checkIn: session.checkIn,
+      checkOut: session.checkOut,
+      guests: session.guests,
+      status: "confirmed",
+      paymentMethod: "online",
+      totalAmount: amount,
+      paymentStatus: "paid",
+      specialRequests: session.specialRequests,
+      createdBy: session.actor,
+    });
+
+    const invoice = await upsertInvoice({
+      bookingId: booking.id,
+      lineItems: [
+        {
+          description: "Room stay charges",
+          quantity: 1,
+          unitPrice: amount,
+        },
+      ],
+      discount: 0,
+    });
+
+    const invoiceId = invoice
+      ? new Types.ObjectId(String((invoice as unknown as { _id: unknown })._id))
+      : undefined;
+
+    if (invoiceId) {
+      await InvoiceModel.findByIdAndUpdate(invoiceId, {
+        paidAmount: invoice?.total ?? 0,
+      });
+    }
+
+    await PaymentTransactionModel.create({
+      booking: booking._id,
+      invoice: invoiceId,
+      amount,
+      method: "online",
+      provider: "razorpay",
+      providerPaymentId: request.body.razorpayPaymentId,
+      status: "captured",
+      metadata: {
+        orderId: request.body.razorpayOrderId,
+        sessionId: session.id,
+      },
+    });
+
+    session.providerPaymentId = request.body.razorpayPaymentId;
+    session.status = "verified";
+    session.verifiedAt = new Date();
+    session.booking = booking._id;
+    await session.save();
+
+    await createAuditLog({
+      actor: request.user?.id,
+      action: "online_booking_payment_verified",
+      entity: "booking",
+      entityId: booking.id,
+      metadata: {
+        sessionId: session.id,
+        orderId: request.body.razorpayOrderId,
+      },
+    });
+
+    sendSuccess(
+      response,
+      booking,
+      "Online payment verified and booking confirmed",
     );
   },
 );

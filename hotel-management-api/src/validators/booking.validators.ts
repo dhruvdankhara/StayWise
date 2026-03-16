@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const createBookingSchema = z.object({
   body: z.object({
@@ -7,10 +7,11 @@ export const createBookingSchema = z.object({
     checkIn: z.string().datetime(),
     checkOut: z.string().datetime(),
     guests: z.number().int().min(1),
-    specialRequests: z.string().optional()
+    paymentMethod: z.enum(["cash", "online"]),
+    specialRequests: z.string().optional(),
   }),
   query: z.object({}).optional(),
-  params: z.object({}).optional()
+  params: z.object({}).optional(),
 });
 
 export const updateBookingSchema = z.object({
@@ -19,16 +20,16 @@ export const updateBookingSchema = z.object({
     checkIn: z.string().datetime().optional(),
     checkOut: z.string().datetime().optional(),
     guests: z.number().int().min(1).optional(),
-    specialRequests: z.string().optional()
+    specialRequests: z.string().optional(),
   }),
   query: z.object({}).optional(),
-  params: z.object({ id: z.string().min(1) })
+  params: z.object({ id: z.string().min(1) }),
 });
 
 export const cancelBookingSchema = z.object({
   body: z.object({
-    reason: z.string().min(3)
+    reason: z.string().min(3),
   }),
   query: z.object({}).optional(),
-  params: z.object({ id: z.string().min(1) })
+  params: z.object({ id: z.string().min(1) }),
 });

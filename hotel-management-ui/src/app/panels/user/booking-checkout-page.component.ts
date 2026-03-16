@@ -1,11 +1,25 @@
-import { AsyncPipe, CurrencyPipe } from '@angular/common';
+import { AsyncPipe, CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, map, switchMap } from 'rxjs';
 
+import { BillingService } from '../../core/services/billing.service';
 import { BookingService } from '../../core/services/booking.service';
 import { RoomService } from '../../core/services/room.service';
+import { PLATFORM_ID } from '@angular/core';
+
+interface RazorpayPaymentResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
 
 @Component({
   selector: 'app-booking-checkout-page',
@@ -104,7 +118,6 @@ import { RoomService } from '../../core/services/room.service';
                   <div class="flex items-center justify-between gap-4 pt-2">
                     <div>
                       <p class="text-sm font-semibold text-neutral-500 mb-1">Base Nightly Rate</p>
-                      
                     </div>
                     <p class="text-3xl font-bold text-neutral-900">
                       {{ room.baseRate | currency: 'INR' : 'symbol' : '1.0-0' }}
@@ -170,6 +183,17 @@ import { RoomService } from '../../core/services/room.service';
                   ></textarea>
                 </label>
 
+                <label class="flex flex-col gap-2">
+                  <span class="text-sm font-semibold text-neutral-700">Payment Method</span>
+                  <select
+                    formControlName="paymentMethod"
+                    class="w-full px-4 py-3 rounded-xl border border-neutral-200 bg-white/80 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all text-sm"
+                  >
+                    <option value="cash">Cash at hotel</option>
+                    <option value="online">Pay online (Razorpay)</option>
+                  </select>
+                </label>
+
                 @if (error()) {
                   <div
                     class="p-3.5 rounded-xl bg-red-50 border border-red-100 flex items-start gap-3"
@@ -196,6 +220,7 @@ import { RoomService } from '../../core/services/room.service';
 
                 <button
                   type="submit"
+                  [disabled]="submitting()"
                   class="button w-full shadow-lg shadow-amber-900/20 hover:scale-[1.02] transition-transform duration-200 py-4 mt-4 flex items-center justify-center gap-2 text-base font-bold bg-neutral-900 hover:bg-neutral-800 border-0"
                 >
                   <svg
@@ -212,10 +237,18 @@ import { RoomService } from '../../core/services/room.service';
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                   </svg>
-                  Confirm Reservation securely
+                  {{
+                    form.getRawValue().paymentMethod === 'online'
+                      ? 'Proceed to online payment'
+                      : 'Confirm reservation'
+                  }}
                 </button>
                 <p class="text-center text-xs text-neutral-400 font-medium">
-                  You will not be charged yet.
+                  {{
+                    form.getRawValue().paymentMethod === 'online'
+                      ? 'You will be redirected to Razorpay checkout.'
+                      : 'Pay with cash at check-in.'
+                  }}
                 </p>
               </form>
             </div>
@@ -226,13 +259,17 @@ import { RoomService } from '../../core/services/room.service';
   `,
 })
 export class BookingCheckoutPageComponent {
+  private razorpayScriptRequest: Promise<void> | null = null;
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly formBuilder = inject(FormBuilder);
   private readonly roomService = inject(RoomService);
   private readonly bookingService = inject(BookingService);
+  private readonly billingService = inject(BillingService);
 
   readonly error = signal('');
+  readonly submitting = signal(false);
   readonly room$ = this.route.paramMap.pipe(
     map((params) => params.get('roomId') ?? ''),
     switchMap((roomId) => this.roomService.getRoom(roomId)),
@@ -243,6 +280,7 @@ export class BookingCheckoutPageComponent {
     checkOut: ['', Validators.required],
     guests: [1, [Validators.required, Validators.min(1)]],
     specialRequests: [''],
+    paymentMethod: ['cash' as 'cash' | 'online', Validators.required],
   });
 
   async submit(): Promise<void> {
@@ -253,20 +291,113 @@ export class BookingCheckoutPageComponent {
       return;
     }
 
+    this.submitting.set(true);
     const roomId = this.route.snapshot.paramMap.get('roomId') ?? '';
+    const formValue = this.form.getRawValue();
+    const payload = {
+      roomId,
+      checkIn: new Date(formValue.checkIn).toISOString(),
+      checkOut: new Date(formValue.checkOut).toISOString(),
+      guests: formValue.guests,
+      specialRequests: formValue.specialRequests,
+      paymentMethod: formValue.paymentMethod,
+    };
 
     try {
+      if (payload.paymentMethod === 'cash') {
+        const booking = await firstValueFrom(this.bookingService.createBooking(payload));
+        await this.router.navigate(['/booking/confirmation', booking.id]);
+        return;
+      }
+
+      const onlineOrder = await firstValueFrom(this.billingService.createOnlineOrder(payload));
+      const paymentResult = await this.openRazorpayCheckout(onlineOrder, roomId);
       const booking = await firstValueFrom(
-        this.bookingService.createBooking({
-          roomId,
-          ...this.form.getRawValue(),
-          checkIn: new Date(this.form.getRawValue().checkIn).toISOString(),
-          checkOut: new Date(this.form.getRawValue().checkOut).toISOString(),
+        this.billingService.verifyOnlinePayment({
+          sessionId: onlineOrder.sessionId,
+          razorpayOrderId: paymentResult.razorpay_order_id,
+          razorpayPaymentId: paymentResult.razorpay_payment_id,
+          razorpaySignature: paymentResult.razorpay_signature,
         }),
       );
       await this.router.navigate(['/booking/confirmation', booking.id]);
-    } catch {
-      this.error.set('Unable to create the booking.');
+    } catch (error) {
+      this.error.set(this.getErrorMessage(error));
+    } finally {
+      this.submitting.set(false);
     }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error && typeof error === 'object' && 'error' in error) {
+      const apiError = error as { error?: { message?: string } };
+      if (apiError.error?.message) {
+        return apiError.error.message;
+      }
+    }
+
+    return 'Unable to complete booking payment flow.';
+  }
+
+  private async ensureRazorpayScript(): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) {
+      throw new Error('Online payment is only available in browser mode');
+    }
+
+    if (window.Razorpay) {
+      return;
+    }
+
+    if (!this.razorpayScriptRequest) {
+      this.razorpayScriptRequest = new Promise<void>((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Unable to load Razorpay checkout script'));
+        document.body.appendChild(script);
+      });
+    }
+
+    return this.razorpayScriptRequest;
+  }
+
+  private async openRazorpayCheckout(
+    order: { keyId: string; amount: number; currency: string; razorpayOrderId: string },
+    roomId: string,
+  ): Promise<RazorpayPaymentResponse> {
+    await this.ensureRazorpayScript();
+
+    const RazorpayCtor = window.Razorpay;
+
+    if (!RazorpayCtor) {
+      throw new Error('Razorpay checkout is unavailable');
+    }
+
+    return new Promise<RazorpayPaymentResponse>((resolve, reject) => {
+      const razorpay = new RazorpayCtor({
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'StayWise',
+        description: `Room booking payment (${roomId})`,
+        order_id: order.razorpayOrderId,
+        handler: (response: Record<string, string>) => {
+          resolve({
+            razorpay_order_id: response['razorpay_order_id'] ?? '',
+            razorpay_payment_id: response['razorpay_payment_id'] ?? '',
+            razorpay_signature: response['razorpay_signature'] ?? '',
+          });
+        },
+        modal: {
+          ondismiss: () => reject(new Error('Payment cancelled by user')),
+        },
+        theme: {
+          color: '#0f172a',
+        },
+      });
+
+      razorpay.open();
+    });
   }
 }

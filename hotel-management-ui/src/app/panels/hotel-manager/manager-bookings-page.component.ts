@@ -418,7 +418,9 @@ export class ManagerBookingsPageComponent {
         await firstValueFrom(this.bookingService.updateBooking(this.editingId()!, payload));
         this.message.set('Booking updated successfully.');
       } else {
-        await firstValueFrom(this.bookingService.createBooking(payload));
+        await firstValueFrom(
+          this.bookingService.createBooking({ ...payload, paymentMethod: 'cash' }),
+        );
         this.message.set('Booking created successfully.');
       }
       this.reset();
