@@ -20,20 +20,10 @@ export const receptionistRoutes: Routes = [
       {
         path: '',
         component: ReceptionistDashboardPageComponent,
-        data: {
-          eyebrow: 'Front desk',
-          title: 'Arrivals, departures, and guest servicing.',
-          description: 'Work the live reservation queue and keep reception synchronized with operations.'
-        }
       },
       {
         path: 'bookings',
         component: ReceptionistBookingsPageComponent,
-        data: {
-          eyebrow: 'Reservation desk',
-          title: 'Manage reservations and guest requests.',
-          description: 'Create walk-ins, edit bookings, and capture special stay requirements.'
-        }
       },
       { path: 'check-in', component: ReceptionistCheckInPageComponent },
       { path: 'check-out', component: ReceptionistCheckOutPageComponent },
@@ -42,12 +32,7 @@ export const receptionistRoutes: Routes = [
       {
         path: 'housekeeping',
         component: ReceptionistHousekeepingPageComponent,
-        data: {
-          eyebrow: 'Operations',
-          title: 'Housekeeping task management.',
-          description: 'Assign, reprioritize, and track room cleaning and maintenance tasks.'
-        }
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];

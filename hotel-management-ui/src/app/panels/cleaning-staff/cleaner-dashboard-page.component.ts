@@ -1,21 +1,19 @@
-import { AsyncPipe, CurrencyPipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 
-import { BookingService } from '../../core/services/booking.service';
 import { HousekeepingService } from '../../core/services/housekeeping.service';
-import { RoomService } from '../../core/services/room.service';
 import { MetricCardComponent } from '../../shared/components/metric-card.component';
 
 @Component({
   selector: 'app-cleaner-dashboard-page',
-  imports: [AsyncPipe, CurrencyPipe, MetricCardComponent],
+  imports: [AsyncPipe, DatePipe, MetricCardComponent, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (vm$ | async; as vm) {
       <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto">
-        <!-- Page Header -->
         <section class="mb-10 lg:mb-14">
           <p
             class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
@@ -33,16 +31,13 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
           </p>
         </section>
 
-        <!-- Metrics Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
           @for (metric of vm.metrics; track metric.label) {
             <app-metric-card [label]="metric.label" [value]="metric.value" [change]="metric.hint" />
           }
         </div>
 
-        <!-- 2 Column Layout for Widgets -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12">
-          <!-- Recent Bookings Widget -->
           <article
             class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm overflow-hidden flex flex-col h-full"
           >
@@ -61,10 +56,14 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
               </div>
-              <h2 class="text-xl font-bold text-neutral-900 m-0">Recent Bookings</h2>
+              <div class="min-w-0">
+                <h2 class="text-xl font-bold text-neutral-900 m-0">Upcoming Tasks</h2>
+                <p class="text-sm text-neutral-500 m-0">Prioritized by schedule time.</p>
+              </div>
             </div>
 
             <div class="overflow-x-auto flex-1 p-2">
@@ -74,12 +73,12 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                     <th
                       class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
                     >
-                      Ref
+                      Room
                     </th>
                     <th
                       class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
                     >
-                      Room
+                      Slot
                     </th>
                     <th
                       class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
@@ -89,18 +88,18 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                     <th
                       class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500 text-right"
                     >
-                      Total
+                      Action
                     </th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-black/5 align-middle">
-                  @for (booking of vm.bookings.slice(0, 5); track booking.id) {
+                  @for (task of vm.nextTasks; track task.id) {
                     <tr class="hover:bg-neutral-50/50 transition-colors">
                       <td class="py-4 px-6 text-sm font-semibold text-neutral-900">
-                        {{ booking.bookingRef }}
+                        Room {{ task.room?.roomNumber || 'TBD' }}
                       </td>
                       <td class="py-4 px-6 text-sm text-neutral-600 font-medium">
-                        {{ booking.room?.type || 'Room' }}
+                        {{ task.scheduledFor | date: 'short' }}
                       </td>
                       <td class="py-4 px-6">
                         <span
@@ -108,19 +107,20 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                         >
                           <span
                             class="w-1.5 h-1.5 rounded-full"
-                            [class.bg-amber-500]="booking.status === 'PENDING'"
-                            [class.bg-emerald-500]="
-                              booking.status === 'CONFIRMED' || booking.status === 'checked_in'
-                            "
-                            [class.bg-neutral-400]="
-                              booking.status === 'checked_out' || booking.status === 'cancelled'
-                            "
+                            [class.bg-neutral-400]="task.status === 'pending'"
+                            [class.bg-amber-500]="task.status === 'in_progress'"
+                            [class.bg-emerald-500]="task.status === 'completed'"
                           ></span>
-                          {{ booking.status }}
+                          {{ task.status.replace('_', ' ') }}
                         </span>
                       </td>
-                      <td class="py-4 px-6 text-sm font-bold text-neutral-900 text-right">
-                        {{ booking.totalAmount | currency: 'INR' : 'symbol' : '1.0-0' }}
+                      <td class="py-4 px-6 text-right">
+                        <a
+                          [routerLink]="['/cleaning-staff/tasks', task.id]"
+                          class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+                        >
+                          Open
+                        </a>
                       </td>
                     </tr>
                   } @empty {
@@ -129,7 +129,7 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                         colspan="4"
                         class="px-6 py-12 text-center text-sm text-neutral-500 font-medium border-0"
                       >
-                        No recent bookings available.
+                        No pending or active tasks.
                       </td>
                     </tr>
                   }
@@ -138,7 +138,6 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
             </div>
           </article>
 
-          <!-- Open Housekeeping Widget -->
           <article
             class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm overflow-hidden flex flex-col h-full"
           >
@@ -169,12 +168,15 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                   <path d="M14 17h3.5"></path>
                 </svg>
               </div>
-              <h2 class="text-xl font-bold text-neutral-900 m-0">Open Housekeeping</h2>
+              <div class="min-w-0">
+                <h2 class="text-xl font-bold text-neutral-900 m-0">Recently Completed</h2>
+                <p class="text-sm text-neutral-500 m-0">Latest finished cleaning items.</p>
+              </div>
             </div>
 
             <div class="p-4 sm:p-6 lg:p-8 flex-1">
               <div class="flex flex-col gap-4">
-                @for (task of vm.tasks.slice(0, 5); track task.id) {
+                @for (task of vm.recentCompleted; track task.id) {
                   <div
                     class="flex items-start gap-4 p-4 rounded-2xl border border-black/5 bg-white hover:border-black/10 transition-colors shadow-sm"
                   >
@@ -188,27 +190,21 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                         <strong class="text-sm font-bold text-neutral-900"
                           >Room {{ task.room?.roomNumber || 'TBD' }}</strong
                         >
-                        @if (task.priority === 'high' || task.priority === 'urgent') {
-                          <span
-                            class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-[10px] font-bold uppercase tracking-wider rounded-full text-red-700"
-                          >
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> High Priority
-                          </span>
-                        } @else {
-                          <span
-                            class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 text-[10px] font-bold uppercase tracking-wider rounded-full text-neutral-600"
-                          >
-                            {{ task.priority }}
-                          </span>
-                        }
+                        <span
+                          class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-[10px] font-bold uppercase tracking-wider rounded-full text-emerald-700"
+                        >
+                          Completed
+                        </span>
                       </div>
                       <div class="flex items-center gap-2 mt-2">
                         <span
                           class="text-xs font-semibold text-neutral-700 px-2 py-0.5 bg-neutral-100 rounded-md uppercase tracking-wide"
-                          >{{ task.status }}</span
+                          >{{ task.priority }}</span
                         >
                         <span class="text-xs text-neutral-500 truncate max-w-[200px]">{{
-                          task.notes || 'No notes provided.'
+                          task.completedAt
+                            ? 'Done on ' + (task.completedAt | date: 'short')
+                            : 'Completed'
                         }}</span>
                       </div>
                     </div>
@@ -236,9 +232,7 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                       </svg>
                     </div>
                     <strong class="block text-neutral-900 font-bold mb-1">No active tasks</strong>
-                    <span class="text-sm text-neutral-500"
-                      >Housekeeping queue is completely clear.</span
-                    >
+                    <span class="text-sm text-neutral-500">Complete tasks will appear here.</span>
                   </div>
                 }
               </div>
@@ -251,32 +245,46 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
 })
 export class CleanerDashboardPageComponent {
   private readonly route = inject(ActivatedRoute);
-  private readonly bookingService = inject(BookingService);
-  private readonly roomService = inject(RoomService);
   private readonly housekeepingService = inject(HousekeepingService);
 
-  readonly vm$ = combineLatest({
-    bookings: this.bookingService.listBookings().pipe(map((result) => result.items)),
-    rooms: this.roomService.listRooms({ limit: 20 }),
-    tasks: this.housekeepingService.listTasks(),
-  }).pipe(
-    map(({ bookings, rooms, tasks }) => {
+  readonly vm$ = this.housekeepingService.listTasks().pipe(
+    map((tasks) => {
       const config = this.route.snapshot.data as {
         eyebrow: string;
         title: string;
         description: string;
       };
+
+      const now = new Date();
+      const openTasks = tasks.filter((task) => task.status !== 'completed');
+      const inProgressTasks = tasks.filter((task) => task.status === 'in_progress');
+      const completedTasks = tasks.filter((task) => task.status === 'completed');
+      const dueToday = openTasks.filter((task) => {
+        const scheduled = new Date(task.scheduledFor);
+        return scheduled.toDateString() === now.toDateString();
+      });
+
+      const nextTasks = [...openTasks]
+        .sort((a, b) => new Date(a.scheduledFor).getTime() - new Date(b.scheduledFor).getTime())
+        .slice(0, 5);
+
+      const recentCompleted = [...completedTasks]
+        .sort(
+          (a, b) => new Date(b.completedAt ?? 0).getTime() - new Date(a.completedAt ?? 0).getTime(),
+        )
+        .slice(0, 5);
+
       return {
         ...config,
-        bookings,
-        tasks,
+        nextTasks,
+        recentCompleted,
         metrics: [
-          { label: 'Bookings', value: String(bookings.length), hint: 'Visible for this role' },
-          { label: 'Rooms', value: String(rooms.length), hint: 'Active inventory loaded' },
+          { label: 'Assigned tasks', value: String(tasks.length), hint: 'Tasks assigned to you' },
+          { label: 'In progress', value: String(inProgressTasks.length), hint: 'Currently active' },
           {
-            label: 'Open tasks',
-            value: String(tasks.filter((task) => task.status !== 'completed').length),
-            hint: 'Housekeeping items not yet finished',
+            label: 'Due today',
+            value: String(dueToday.length),
+            hint: 'Open items scheduled for today',
           },
         ],
       };

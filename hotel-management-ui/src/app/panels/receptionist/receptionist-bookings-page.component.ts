@@ -22,7 +22,7 @@ import { RoomListItem } from '../../core/models/app.models';
             class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
           >
             <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-            {{ title().eyebrow }}
+            Reservation desk
           </p>
           @if (!isFormOpen()) {
             <button
@@ -41,12 +41,12 @@ import { RoomListItem } from '../../core/models/app.models';
         @if (isFormOpen()) {
           <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-8">
             <form
-              class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
+              class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
               [formGroup]="form"
               (ngSubmit)="save()"
             >
               <div
-                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-2xl rounded-full pointer-events-none"
               ></div>
 
               <div class="flex items-center gap-3 mb-8 relative z-10">
@@ -227,7 +227,7 @@ import { RoomListItem } from '../../core/models/app.models';
         <!-- Table Side -->
         <div class="lg:col-span-8 xl:col-span-9">
           <div
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
+            class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
           >
             <div class="p-6 border-b border-black/5 bg-neutral-50/50 flex items-center gap-4">
               <div
@@ -257,7 +257,7 @@ import { RoomListItem } from '../../core/models/app.models';
 
             <div class="overflow-x-auto flex-1 p-2">
               @if (bookings$ | async; as bookings) {
-                <table class="w-full text-left border-collapse min-w-[700px]">
+                <table class="w-full text-left border-collapse min-w-175">
                   <thead>
                     <tr>
                       <th
@@ -299,10 +299,9 @@ import { RoomListItem } from '../../core/models/app.models';
                           <strong class="block text-sm font-bold text-neutral-900 mb-0.5">{{
                             booking.bookingRef
                           }}</strong>
-                          <span
-                            class="text-xs text-neutral-500 truncate max-w-[150px] inline-block"
-                            >{{ booking.guest?.name || booking.guest?.id || 'Guest' }}</span
-                          >
+                          <span class="text-xs text-neutral-500 truncate max-w-37.5 inline-block">{{
+                            booking.guest?.name || booking.guest?.id || 'Guest'
+                          }}</span>
                         </td>
                         <td class="py-4 px-6 text-sm text-neutral-600 font-medium">
                           {{ booking.room?.roomNumber }} -

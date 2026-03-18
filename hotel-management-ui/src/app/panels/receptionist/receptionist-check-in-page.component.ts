@@ -76,7 +76,7 @@ import { BookingService } from '../../core/services/booking.service';
       }
 
       <div
-        class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
+        class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
       >
         <div class="p-6 border-b border-black/5 bg-neutral-50/50 flex items-center gap-4">
           <div
@@ -102,7 +102,7 @@ import { BookingService } from '../../core/services/booking.service';
         </div>
 
         <div class="overflow-x-auto flex-1 p-2">
-          <table class="w-full text-left border-collapse min-w-[700px]">
+          <table class="w-full text-left border-collapse min-w-175">
             <thead>
               <tr>
                 <th class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500">
@@ -131,7 +131,7 @@ import { BookingService } from '../../core/services/booking.service';
                     <strong class="block text-sm font-bold text-neutral-900 mb-0.5">
                       {{ booking.bookingRef }}
                     </strong>
-                    <span class="text-xs text-neutral-500 truncate max-w-[150px] inline-block">
+                    <span class="text-xs text-neutral-500 truncate max-w-37.5 inline-block">
                       {{ booking.guest?.name || 'Unknown Guest' }}
                     </span>
                     <span

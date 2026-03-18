@@ -15,7 +15,7 @@ import { RoomService } from '../../core/services/room.service';
   imports: [AsyncPipe, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto pb-12">
+    <div class="animate-fade-in relative z-10 max-w-400 mx-auto pb-12">
       <!-- Header -->
       <section class="mb-8 lg:mb-12">
         <div class="flex items-center justify-between gap-4">
@@ -54,7 +54,7 @@ import { RoomService } from '../../core/services/room.service';
               (ngSubmit)="save()"
             >
               <div
-                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-2xl rounded-full pointer-events-none"
               ></div>
 
               <div class="flex items-center gap-3 mb-8 relative z-10">
@@ -228,7 +228,7 @@ import { RoomService } from '../../core/services/room.service';
         <!-- Table Side -->
         <div class="lg:col-span-8">
           <div
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
+            class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
           >
             <div
               class="p-6 border-b border-black/5 bg-neutral-50/50 flex items-center justify-between gap-4"
@@ -266,7 +266,7 @@ import { RoomService } from '../../core/services/room.service';
 
             <div class="overflow-x-auto flex-1 p-2">
               @if (tasks$ | async; as tasks) {
-                <table class="w-full text-left border-collapse min-w-[500px]">
+                <table class="w-full text-left border-collapse min-w-125">
                   <thead>
                     <tr>
                       <th

@@ -32,7 +32,7 @@ import { BookingService } from '../../core/services/booking.service';
         class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm p-8 sm:p-10 relative overflow-hidden"
       >
         <div
-          class="absolute -top-32 -left-32 w-64 h-64 bg-emerald-500/10 blur-[40px] rounded-full pointer-events-none"
+          class="absolute -top-32 -left-32 w-64 h-64 bg-emerald-500/10 blur-2xl rounded-full pointer-events-none"
         ></div>
 
         <form [formGroup]="paymentForm" (ngSubmit)="recordPayment()" class="relative z-10">
@@ -112,7 +112,7 @@ import { BookingService } from '../../core/services/booking.service';
               </div>
 
               <div
-                class="w-full sm:w-auto bg-emerald-900/30 border border-emerald-800/50 rounded-2xl p-5 text-center flex flex-col justify-center items-center h-full min-h-[120px]"
+                class="w-full sm:w-auto bg-emerald-900/30 border border-emerald-800/50 rounded-2xl p-5 text-center flex flex-col justify-center items-center h-full min-h-30"
               >
                 <p class="text-xs font-bold text-emerald-500/80 uppercase tracking-widest mb-1.5">
                   Remaining Balance
