@@ -20,7 +20,7 @@ import { AuthService } from '../core/services/auth.service';
               class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-950/5 border border-orange-900/10 mb-4"
             >
               <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-              <p class="eyebrow !m-0 !text-xs text-amber-800">Welcome Back</p>
+              <p class="eyebrow m-0! text-xs! text-amber-800">Welcome Back</p>
             </div>
             <h1
               class="text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 leading-[1.1]"
@@ -54,7 +54,7 @@ import { AuthService } from '../core/services/auth.service';
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
               </div>
-              <p class="eyebrow !m-0 text-amber-900">Seeded Demo Accounts</p>
+              <p class="eyebrow m-0! text-amber-900">Seeded Demo Accounts</p>
             </div>
             <div class="flex flex-wrap gap-2 text-sm">
               <code
@@ -101,7 +101,7 @@ import { AuthService } from '../core/services/auth.service';
           ></div>
 
           <form
-            class="surface relative z-10 border border-white/60 shadow-2xl rounded-[2rem] p-8 backdrop-blur-xl bg-white/80 flex flex-col gap-6"
+            class="surface relative z-10 border border-white/60 shadow-2xl rounded-4xl p-8 backdrop-blur-xl bg-white/80 flex flex-col gap-6"
             [formGroup]="form"
             (ngSubmit)="submit()"
           >

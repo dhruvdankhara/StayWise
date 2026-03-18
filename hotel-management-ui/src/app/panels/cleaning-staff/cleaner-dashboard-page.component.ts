@@ -13,7 +13,7 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (vm$ | async; as vm) {
-      <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto">
+      <div class="animate-fade-in relative z-10 max-w-400 mx-auto">
         <section class="mb-10 lg:mb-14">
           <p
             class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
@@ -67,7 +67,7 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
             </div>
 
             <div class="overflow-x-auto flex-1 p-2">
-              <table class="w-full text-left border-collapse min-w-[500px]">
+              <table class="w-full text-left border-collapse min-w-125">
                 <thead>
                   <tr>
                     <th
@@ -201,7 +201,7 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
                           class="text-xs font-semibold text-neutral-700 px-2 py-0.5 bg-neutral-100 rounded-md uppercase tracking-wide"
                           >{{ task.priority }}</span
                         >
-                        <span class="text-xs text-neutral-500 truncate max-w-[200px]">{{
+                        <span class="text-xs text-neutral-500 truncate max-w-50">{{
                           task.completedAt
                             ? 'Done on ' + (task.completedAt | date: 'short')
                             : 'Completed'

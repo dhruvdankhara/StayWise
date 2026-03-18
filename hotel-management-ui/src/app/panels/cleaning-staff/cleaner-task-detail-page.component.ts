@@ -101,7 +101,7 @@ import { HousekeepingService } from '../../core/services/housekeeping.service';
         }
 
         <article
-          class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
+          class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
         >
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div class="p-4 rounded-xl bg-neutral-50 border border-black/5">

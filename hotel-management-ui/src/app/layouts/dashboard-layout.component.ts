@@ -20,7 +20,7 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
         </div>
 
         <!-- Profile Profile Chip -->
-        <div class="p-6 border-b border-black/5 bg-gradient-to-br from-amber-50/50 to-orange-50/20">
+        <div class="p-6 border-b border-black/5 bg-linear-to-br from-amber-50/50 to-orange-50/20">
           <p class="text-xs font-bold text-amber-700 uppercase tracking-widest mb-4">
             Signed in as
           </p>
@@ -101,10 +101,10 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
       <!-- Dashboard Main Shell -->
       <main class="flex-1 overflow-hidden relative min-h-screen">
         <div
-          class="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none -z-10"
+          class="absolute top-0 right-0 w-125 h-125 bg-amber-500/10 blur-[120px] rounded-full pointer-events-none -z-10"
         ></div>
         <div
-          class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-400/5 blur-[100px] rounded-full pointer-events-none -z-10"
+          class="absolute bottom-0 left-0 w-100 h-100 bg-orange-400/5 blur-[100px] rounded-full pointer-events-none -z-10"
         ></div>
         <div class="h-full overflow-y-auto p-4 md:p-8 lg:p-12 z-10 relative">
           <router-outlet />

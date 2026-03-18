@@ -31,7 +31,7 @@ import { AuthService } from '../../core/services/auth.service';
       >
         <!-- Ambient bubble -->
         <div
-          class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+          class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-2xl rounded-full pointer-events-none"
         ></div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">

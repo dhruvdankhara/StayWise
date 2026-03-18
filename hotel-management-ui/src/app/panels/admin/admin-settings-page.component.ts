@@ -9,7 +9,7 @@ import { SettingsService } from '../../core/services/settings.service';
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="animate-fade-in relative z-10 max-w-[1200px] mx-auto pb-12">
+    <div class="animate-fade-in relative z-10 max-w-300 mx-auto pb-12">
       <!-- Header -->
       <section class="mb-8 lg:mb-12">
         <p
@@ -36,7 +36,7 @@ import { SettingsService } from '../../core/services/settings.service';
           class="absolute -top-32 -right-32 w-96 h-96 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none"
         ></div>
         <div
-          class="absolute -bottom-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+          class="absolute -bottom-32 -left-32 w-64 h-64 bg-amber-500/10 blur-2xl rounded-full pointer-events-none"
         ></div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 relative z-10">

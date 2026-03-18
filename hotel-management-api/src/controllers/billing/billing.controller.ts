@@ -15,7 +15,7 @@ import {
   ensureRoomAvailability,
   generateBookingReference,
 } from "../../services/booking.service";
-import { buildPdfBuffer } from "../../services/pdf.service";
+import { buildInvoicePdfBuffer } from "../../services/pdf.service";
 import { upsertInvoice } from "../../services/invoice.service";
 import { sendSuccess } from "../../utils/api";
 import { AppError } from "../../utils/AppError";
@@ -362,11 +362,12 @@ export const verifyOnlinePayment = asyncHandler(
 
 export const downloadInvoicePdf = asyncHandler(
   async (request: Request, response: Response) => {
-    await ensureBookingAccess(
+    const booking = await ensureBookingAccess(
       String(request.params.bookingId),
       request.user?.id,
       request.user?.role,
     );
+
     const invoice = await InvoiceModel.findOne({
       booking: request.params.bookingId,
     }).populate("guest", "name email");
@@ -376,18 +377,38 @@ export const downloadInvoicePdf = asyncHandler(
       throw new AppError(404, "Invoice not found");
     }
 
-    const buffer = await buildPdfBuffer(`Invoice ${invoice.id}`, [
-      settings?.name ?? "StayWise",
-      `Guest: ${getGuestName(invoice.guest)}`,
-      `Subtotal: ${invoice.subtotal}`,
-      `Discount: ${invoice.discount}`,
-      `Total: ${invoice.total}`,
-      `Paid: ${invoice.paidAmount}`,
-      ...invoice.lineItems.map(
-        (item) =>
-          `${item.description} - ${item.quantity} x ${item.unitPrice} = ${item.total}`,
-      ),
-    ]);
+    const guestEmail =
+      invoice.guest &&
+      typeof invoice.guest === "object" &&
+      "email" in invoice.guest
+        ? String((invoice.guest as { email?: string }).email ?? "")
+        : "";
+
+    const buffer = await buildInvoicePdfBuffer({
+      invoiceId: invoice.id,
+      issuedAt: invoice.issuedAt,
+      hotelName: settings?.name ?? "StayWise Grand Hotel",
+      hotelAddress: settings?.address,
+      hotelContactEmail: settings?.contactEmail,
+      hotelContactPhone: settings?.contactPhone,
+      guestName: getGuestName(invoice.guest),
+      guestEmail: guestEmail || undefined,
+      bookingRef: booking.bookingRef,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      subtotal: invoice.subtotal,
+      discount: invoice.discount,
+      total: invoice.total,
+      paidAmount: invoice.paidAmount,
+      currency: settings?.currency ?? "INR",
+      lineItems: invoice.lineItems.map((item) => ({
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        total: item.total,
+      })),
+      footer: settings?.invoiceFooter,
+    });
 
     response.setHeader("Content-Type", "application/pdf");
     response.setHeader(

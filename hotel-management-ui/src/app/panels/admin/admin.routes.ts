@@ -6,6 +6,7 @@ import { DashboardLayoutComponent } from '../../layouts/dashboard-layout.compone
 import { AdminBookingsPageComponent } from './admin-bookings-page.component';
 import { AdminDashboardPageComponent } from './admin-dashboard-page.component';
 import { AdminRoomsPageComponent } from './admin-rooms-page.component';
+import { AdminReportsPageComponent } from './admin-reports-page.component';
 import { AdminSettingsPageComponent } from './admin-settings-page.component';
 import { AdminStaffPageComponent } from './admin-staff-page.component';
 
@@ -21,8 +22,9 @@ export const adminRoutes: Routes = [
         data: {
           eyebrow: 'Administration',
           title: 'Executive control across hotel operations.',
-          description: 'Monitor rooms, reservations, and housekeeping throughput from one dashboard.'
-        }
+          description:
+            'Monitor rooms, reservations, and housekeeping throughput from one dashboard.',
+        },
       },
       { path: 'staff', component: AdminStaffPageComponent },
       {
@@ -31,8 +33,8 @@ export const adminRoutes: Routes = [
         data: {
           eyebrow: 'Inventory control',
           title: 'Room inventory, pricing, and visual merchandising.',
-          description: 'Manage active room types, operational status, and uploaded media.'
-        }
+          description: 'Manage active room types, operational status, and uploaded media.',
+        },
       },
       {
         path: 'bookings',
@@ -40,10 +42,11 @@ export const adminRoutes: Routes = [
         data: {
           eyebrow: 'Reservations',
           title: 'Reservation governance and booking interventions.',
-          description: 'Create, edit, and cancel bookings with live property data.'
-        }
+          description: 'Create, edit, and cancel bookings with live property data.',
+        },
       },
-      { path: 'settings', component: AdminSettingsPageComponent }
-    ]
-  }
+      { path: 'reports', component: AdminReportsPageComponent },
+      { path: 'settings', component: AdminSettingsPageComponent },
+    ],
+  },
 ];

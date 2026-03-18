@@ -13,6 +13,7 @@ export const navigationByRole: Record<UserRole, NavItem[]> = {
     { label: 'Staff', path: '/admin/staff' },
     { label: 'Rooms', path: '/admin/rooms' },
     { label: 'Bookings', path: '/admin/bookings' },
+    { label: 'Reports', path: '/admin/reports' },
     { label: 'Settings', path: '/admin/settings' },
   ],
   receptionist: [

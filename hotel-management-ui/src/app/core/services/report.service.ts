@@ -4,9 +4,36 @@ import { Observable } from 'rxjs';
 import type { ReportRow } from '../models/app.models';
 import { ApiService } from './api.service';
 
+export interface AnalyticsSummary {
+  bookings: {
+    totalBookings: number;
+    activeBookings: number;
+    completedBookings: number;
+    totalRevenue: number;
+  };
+  rooms: {
+    totalRooms: number;
+    availableRooms: number;
+    occupiedRooms: number;
+  };
+  housekeeping: {
+    totalTasks: number;
+    completedTasks: number;
+    pendingTasks: number;
+  };
+  guests: {
+    totalGuests: number;
+    repeatGuests: number;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class ReportService {
   private readonly api = inject(ApiService);
+
+  analyticsSummary(): Observable<AnalyticsSummary> {
+    return this.api.get<AnalyticsSummary>('/reports/summary');
+  }
 
   occupancyReport(params?: Record<string, string>): Observable<ReportRow[]> {
     return this.api.get<ReportRow[]>('/reports/occupancy', params);
@@ -24,7 +51,10 @@ export class ReportService {
     return this.api.get<ReportRow[]>('/reports/guests', params);
   }
 
-  downloadReport(path: '/reports/occupancy' | '/reports/revenue' | '/reports/staff' | '/reports/guests', format: 'pdf' | 'xlsx'): Observable<Blob> {
+  downloadReport(
+    path: '/reports/occupancy' | '/reports/revenue' | '/reports/staff' | '/reports/guests',
+    format: 'pdf' | 'xlsx',
+  ): Observable<Blob> {
     return this.api.download(path, { format });
   }
 }
