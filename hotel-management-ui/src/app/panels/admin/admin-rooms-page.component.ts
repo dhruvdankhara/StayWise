@@ -7,6 +7,15 @@ import { BehaviorSubject, firstValueFrom, switchMap } from 'rxjs';
 import { RoomService } from '../../core/services/room.service';
 import { UploadService } from '../../core/services/upload.service';
 
+const ROOM_TYPE_OPTIONS = ['single', 'double', 'suite', 'deluxe', 'family'] as const;
+const ROOM_STATUS_OPTIONS = [
+  'available',
+  'occupied',
+  'dirty',
+  'maintenance',
+  'out_of_order',
+] as const;
+
 @Component({
   selector: 'app-admin-rooms-page',
   imports: [AsyncPipe, CurrencyPipe, ReactiveFormsModule],
@@ -15,12 +24,23 @@ import { UploadService } from '../../core/services/upload.service';
     <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto pb-12">
       <!-- Header -->
       <section class="mb-8 lg:mb-12">
-        <p
-          class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
-        >
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          {{ title().eyebrow }}
-        </p>
+        <div class="flex items-center justify-between gap-4">
+          <p
+            class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            {{ title().eyebrow }}
+          </p>
+          @if (!isFormOpen()) {
+            <button
+              type="button"
+              class="button px-4 py-2 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+              (click)="openCreateForm()"
+            >
+              New Room
+            </button>
+          }
+        </div>
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 mb-4">
           {{ title().title }}
         </h1>
@@ -32,142 +52,173 @@ import { UploadService } from '../../core/services/upload.service';
       <!-- Main Action Grid -->
       <div class="grid grid-cols-1 gap-8 ">
         <!-- Form Side -->
-        <div class="lg:col-span-4 lg:sticky lg:top-8">
-          <form
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
-            [formGroup]="form"
-            (ngSubmit)="save()"
-          >
-            <div
-              class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
-            ></div>
-
-            <div class="flex items-center gap-3 mb-8 relative z-10">
+        @if (isFormOpen()) {
+          <div class="lg:col-span-4 lg:sticky lg:top-8">
+            <form
+              class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
+              [formGroup]="form"
+              (ngSubmit)="save()"
+            >
               <div
-                class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+              ></div>
+
+              <div class="flex items-center gap-3 mb-8 relative z-10">
+                <div
+                  class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
                 >
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-              <h2 class="text-xl font-bold text-neutral-900 m-0">
-                {{ editingId() ? 'Edit Room Profile' : 'Add New Room' }}
-              </h2>
-            </div>
-
-            <div class="flex flex-col gap-5 relative z-10">
-              <div class="grid grid-cols-2 gap-4">
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Room Number</span
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   >
-                  <input
-                    type="text"
-                    formControlName="roomNumber"
-                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none font-bold text-neutral-900"
-                  />
-                </label>
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Room Type</span
-                  >
-                  <input
-                    type="text"
-                    formControlName="type"
-                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none capitalize"
-                  />
-                </label>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+                <h2 class="text-xl font-bold text-neutral-900 m-0">
+                  {{ editingId() ? 'Edit Room Profile' : 'Add New Room' }}
+                </h2>
               </div>
 
-              <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col gap-5 relative z-10">
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Room Number</span
+                    >
+                    <input
+                      type="text"
+                      formControlName="roomNumber"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none font-bold text-neutral-900"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Room Type</span
+                    >
+                    <select
+                      formControlName="type"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none capitalize cursor-pointer"
+                    >
+                      @for (type of roomTypeOptions; track type) {
+                        <option [value]="type">{{ type }}</option>
+                      }
+                    </select>
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Floor Level</span
+                    >
+                    <input
+                      type="number"
+                      formControlName="floor"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Capacity (Pax)</span
+                    >
+                    <input
+                      type="number"
+                      formControlName="capacity"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                    />
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Base Rate (INR)</span
+                    >
+                    <input
+                      type="number"
+                      formControlName="baseRate"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none font-bold text-amber-900"
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Current Status</span
+                    >
+                    <select
+                      formControlName="status"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none cursor-pointer"
+                    >
+                      @for (status of roomStatusOptions; track status) {
+                        <option [value]="status">{{ status }}</option>
+                      }
+                    </select>
+                  </label>
+                </div>
+
                 <label class="flex flex-col gap-1.5">
                   <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Floor Level</span
+                    >Room Description</span
                   >
-                  <input
-                    type="number"
-                    formControlName="floor"
-                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                  />
+                  <textarea
+                    formControlName="description"
+                    rows="2"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none resize-none"
+                  ></textarea>
                 </label>
+
                 <label class="flex flex-col gap-1.5">
                   <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Capacity (Pax)</span
+                    >Upload Photo</span
                   >
-                  <input
-                    type="number"
-                    formControlName="capacity"
-                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                  />
+                  <div class="relative group cursor-pointer">
+                    <input
+                      type="file"
+                      (change)="upload($event)"
+                      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div
+                      class="w-full px-4 py-3 bg-neutral-50 border border-dashed border-black/20 rounded-xl group-hover:bg-white group-hover:border-amber-500/50 transition-all flex items-center justify-center gap-2 text-sm text-neutral-500"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Choose an image to upload...</span>
+                    </div>
+                  </div>
                 </label>
               </div>
 
-              <div class="grid grid-cols-2 gap-4">
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Base Rate (INR)</span
-                  >
-                  <input
-                    type="number"
-                    formControlName="baseRate"
-                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none font-bold text-amber-900"
-                  />
-                </label>
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Current Status</span
-                  >
-                  <select
-                    formControlName="status"
-                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none cursor-pointer"
-                  >
-                    <option value="available">Available</option>
-                    <option value="occupied">Occupied</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="cleaning">Cleaning</option>
-                  </select>
-                </label>
-              </div>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Room Description</span
+              @if (message()) {
+                <div
+                  class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
                 >
-                <textarea
-                  formControlName="description"
-                  rows="2"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none resize-none"
-                ></textarea>
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Upload Photo</span
-                >
-                <div class="relative group cursor-pointer">
-                  <input
-                    type="file"
-                    (change)="upload($event)"
-                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
                   <div
-                    class="w-full px-4 py-3 bg-neutral-50 border border-dashed border-black/20 rounded-xl group-hover:bg-white group-hover:border-amber-500/50 transition-all flex items-center justify-center gap-2 text-sm text-neutral-500"
+                    class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="14"
+                      height="14"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -175,77 +226,57 @@ import { UploadService } from '../../core/services/upload.service';
                       stroke-linecap="round"
                       stroke-linejoin="round"
                     >
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="17 8 12 3 7 8"></polyline>
-                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                      <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span>Choose an image to upload...</span>
                   </div>
+                  <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
                 </div>
-              </label>
-            </div>
-
-            @if (message()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
+              }
+              @if (error()) {
                 <div
-                  class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <div
+                    class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
                 </div>
-                <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
-              </div>
-            }
-            @if (error()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
-                <div
-                  class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                </div>
-                <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
-              </div>
-            }
+              }
 
-            <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
-              <button
-                type="submit"
-                class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
-              >
-                {{ editingId() ? 'Save Room Details' : 'Initialize New Room' }}
-              </button>
-            </div>
-          </form>
-        </div>
+              <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
+                <button
+                  type="submit"
+                  class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+                >
+                  {{ editingId() ? 'Save Room Details' : 'Initialize New Room' }}
+                </button>
+                <button
+                  type="button"
+                  class="w-full py-2.5 text-sm font-semibold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 rounded-xl transition-colors"
+                  (click)="resetForm()"
+                >
+                  {{ editingId() ? 'Cancel Edit' : 'Close Form' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        }
 
         <!-- Table Side -->
         <div class="lg:col-span-8">
@@ -352,17 +383,20 @@ import { UploadService } from '../../core/services/upload.service';
                             [class.bg-emerald-50]="room.status === 'available'"
                             [class.text-amber-700]="room.status === 'occupied'"
                             [class.bg-amber-50]="room.status === 'occupied'"
+                            [class.text-orange-700]="room.status === 'dirty'"
+                            [class.bg-orange-50]="room.status === 'dirty'"
                             [class.text-red-700]="room.status === 'maintenance'"
                             [class.bg-red-50]="room.status === 'maintenance'"
-                            [class.text-blue-700]="room.status === 'cleaning'"
-                            [class.bg-blue-50]="room.status === 'cleaning'"
+                            [class.text-slate-700]="room.status === 'out_of_order'"
+                            [class.bg-slate-100]="room.status === 'out_of_order'"
                           >
                             <span
                               class="w-1.5 h-1.5 rounded-full"
                               [class.bg-emerald-500]="room.status === 'available'"
                               [class.bg-amber-500]="room.status === 'occupied'"
+                              [class.bg-orange-500]="room.status === 'dirty'"
                               [class.bg-red-500]="room.status === 'maintenance'"
-                              [class.bg-blue-500]="room.status === 'cleaning'"
+                              [class.bg-slate-500]="room.status === 'out_of_order'"
                             ></span>
                             {{ room.status }}
                           </span>
@@ -450,11 +484,14 @@ export class AdminRoomsPageComponent {
     this.route.snapshot.data as { eyebrow: string; title: string; description: string },
   );
   readonly editingId = signal<string | null>(null);
+  readonly isFormOpen = signal(false);
   readonly message = signal('');
   readonly error = signal('');
+  readonly roomTypeOptions = ROOM_TYPE_OPTIONS;
+  readonly roomStatusOptions = ROOM_STATUS_OPTIONS;
   readonly form = this.formBuilder.nonNullable.group({
     roomNumber: ['', Validators.required],
-    type: ['', Validators.required],
+    type: ['single', Validators.required],
     floor: [1, Validators.required],
     capacity: [1, Validators.required],
     baseRate: [4500, Validators.required],
@@ -485,6 +522,7 @@ export class AdminRoomsPageComponent {
         await firstValueFrom(this.roomService.createRoom(payload));
         this.message.set('Room created successfully.');
       }
+      this.resetForm();
       this.refresh$.next();
     } catch {
       this.error.set('Unable to save the room.');
@@ -493,6 +531,7 @@ export class AdminRoomsPageComponent {
 
   async edit(id: string): Promise<void> {
     const room = await firstValueFrom(this.roomService.getRoom(id));
+    this.isFormOpen.set(true);
     this.editingId.set(id);
     this.form.patchValue({
       roomNumber: room.roomNumber,
@@ -532,5 +571,39 @@ export class AdminRoomsPageComponent {
     } catch {
       this.error.set('Unable to upload the image.');
     }
+  }
+
+  openCreateForm(): void {
+    this.error.set('');
+    this.message.set('');
+    this.editingId.set(null);
+    this.isFormOpen.set(true);
+    this.form.reset({
+      roomNumber: '',
+      type: 'single',
+      floor: 1,
+      capacity: 1,
+      baseRate: 4500,
+      status: 'available',
+      description: '',
+      amenities: 'Wi-Fi',
+      images: [],
+    });
+  }
+
+  resetForm(): void {
+    this.editingId.set(null);
+    this.isFormOpen.set(false);
+    this.form.reset({
+      roomNumber: '',
+      type: 'single',
+      floor: 1,
+      capacity: 1,
+      baseRate: 4500,
+      status: 'available',
+      description: '',
+      amenities: 'Wi-Fi',
+      images: [],
+    });
   }
 }

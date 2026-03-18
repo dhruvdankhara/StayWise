@@ -156,7 +156,6 @@ import { HousekeepingService } from '../../core/services/housekeeping.service';
               <button
                 type="button"
                 class="px-4 py-2 text-sm font-semibold bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl transition-colors disabled:opacity-50"
-                [disabled]="task.status === 'completed'"
                 (click)="update(task.id, 'completed')"
               >
                 Complete Task

@@ -13,12 +13,23 @@ import { StaffService } from '../../core/services/staff.service';
     <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto pb-12">
       <!-- Header -->
       <section class="mb-8 lg:mb-12">
-        <p
-          class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
-        >
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          Staff Directory
-        </p>
+        <div class="flex items-center justify-between gap-4">
+          <p
+            class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            Staff Directory
+          </p>
+          @if (!isFormOpen()) {
+            <button
+              type="button"
+              class="button px-4 py-2 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+              (click)="openCreateForm()"
+            >
+              New Member
+            </button>
+          }
+        </div>
         <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 mb-4">
           Team Management
         </h1>
@@ -30,164 +41,173 @@ import { StaffService } from '../../core/services/staff.service';
       <!-- Main Action Grid -->
       <div class="grid grid-cols-1 gap-8 ">
         <!-- Form Side -->
-        <div class="w-full">
-          <form
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
-            [formGroup]="form"
-            (ngSubmit)="save()"
-          >
-            <div
-              class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
-            ></div>
-
-            <div class="flex items-center gap-3 mb-8 relative z-10">
+        @if (isFormOpen()) {
+          <div class="w-full">
+            <form
+              class="surface bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
+              [formGroup]="form"
+              (ngSubmit)="save()"
+            >
               <div
-                class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+              ></div>
+
+              <div class="flex items-center gap-3 mb-8 relative z-10">
+                <div
+                  class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
                 >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <line x1="19" y1="8" x2="19" y2="14"></line>
-                  <line x1="22" y1="11" x2="16" y2="11"></line>
-                </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="19" y1="8" x2="19" y2="14"></line>
+                    <line x1="22" y1="11" x2="16" y2="11"></line>
+                  </svg>
+                </div>
+                <h2 class="text-xl font-bold text-neutral-900 m-0">
+                  {{ editingId() ? 'Update member' : 'Add new member' }}
+                </h2>
               </div>
-              <h2 class="text-xl font-bold text-neutral-900 m-0">
-                {{ editingId() ? 'Update member' : 'Add new member' }}
-              </h2>
-            </div>
 
-            <div class="flex flex-col gap-5 relative z-10">
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Full Name</span
-                >
-                <input
-                  type="text"
-                  formControlName="name"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Email Address</span
-                >
-                <input
-                  type="email"
-                  formControlName="email"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Phone Number</span
-                >
-                <input
-                  type="tel"
-                  formControlName="phone"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Role Assignment</span
-                >
-                <select
-                  formControlName="role"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none cursor-pointer"
-                >
-                  <option value="receptionist">Receptionist</option>
-                  <option value="cleaning_staff">Cleaning Staff</option>
-                </select>
-              </label>
-
-              @if (!editingId()) {
+              <div class="flex flex-col gap-5 relative z-10">
                 <label class="flex flex-col gap-1.5">
                   <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Temporary Password</span
+                    >Full Name</span
                   >
                   <input
-                    type="password"
-                    formControlName="password"
+                    type="text"
+                    formControlName="name"
                     class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
                   />
                 </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Email Address</span
+                  >
+                  <input
+                    type="email"
+                    formControlName="email"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  />
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Phone Number</span
+                  >
+                  <input
+                    type="tel"
+                    formControlName="phone"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  />
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Role Assignment</span
+                  >
+                  <select
+                    formControlName="role"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none cursor-pointer"
+                  >
+                    <option value="receptionist">Receptionist</option>
+                    <option value="cleaning_staff">Cleaning Staff</option>
+                  </select>
+                </label>
+
+                @if (!editingId()) {
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Temporary Password</span
+                    >
+                    <input
+                      type="password"
+                      formControlName="password"
+                      class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                    />
+                  </label>
+                }
+              </div>
+
+              @if (message()) {
+                <div
+                  class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
+                >
+                  <div
+                    class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
+                </div>
               }
-            </div>
-
-            @if (message()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
+              @if (error()) {
                 <div
-                  class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <div
+                    class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
                 </div>
-                <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
-              </div>
-            }
-            @if (error()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
-                <div
-                  class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                </div>
-                <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
-              </div>
-            }
+              }
 
-            <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
-              <button
-                type="submit"
-                class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
-              >
-                {{ editingId() ? 'Save changes' : 'Create account' }}
-              </button>
-            </div>
-          </form>
-        </div>
+              <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
+                <button
+                  type="submit"
+                  class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+                >
+                  {{ editingId() ? 'Save changes' : 'Create account' }}
+                </button>
+                <button
+                  type="button"
+                  class="w-full py-2.5 text-sm font-semibold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 rounded-xl transition-colors"
+                  (click)="resetForm()"
+                >
+                  {{ editingId() ? 'Cancel Edit' : 'Close Form' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        }
 
         <!-- Table Side -->
         <div class="lg:col-span-8">
@@ -354,6 +374,7 @@ export class AdminStaffPageComponent {
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
 
   readonly editingId = signal<string | null>(null);
+  readonly isFormOpen = signal(false);
   readonly message = signal('');
   readonly error = signal('');
   readonly form = this.formBuilder.nonNullable.group({
@@ -379,7 +400,7 @@ export class AdminStaffPageComponent {
         await firstValueFrom(this.staffService.createStaff(this.form.getRawValue()));
         this.message.set('Staff account created.');
       }
-      this.editingId.set(null);
+      this.resetForm();
       this.refresh$.next();
     } catch {
       this.error.set('Unable to save the staff account.');
@@ -392,6 +413,7 @@ export class AdminStaffPageComponent {
     if (!member) {
       return;
     }
+    this.isFormOpen.set(true);
     this.editingId.set(id);
     this.form.patchValue({
       name: member.name,
@@ -409,5 +431,31 @@ export class AdminStaffPageComponent {
     } catch {
       this.error.set('Unable to deactivate the staff account.');
     }
+  }
+
+  openCreateForm(): void {
+    this.error.set('');
+    this.message.set('');
+    this.editingId.set(null);
+    this.isFormOpen.set(true);
+    this.form.reset({
+      name: '',
+      email: '',
+      phone: '',
+      role: 'receptionist',
+      password: 'Password@123',
+    });
+  }
+
+  resetForm(): void {
+    this.editingId.set(null);
+    this.isFormOpen.set(false);
+    this.form.reset({
+      name: '',
+      email: '',
+      phone: '',
+      role: 'receptionist',
+      password: 'Password@123',
+    });
   }
 }

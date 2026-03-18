@@ -109,7 +109,7 @@ import { SettingsService } from '../../core/services/settings.service';
               </label>
             </div>
 
-            <label class="flex flex-col gap-1.5">
+            <!-- <label class="flex flex-col gap-1.5">
               <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
                 >Brand Logo URL</span
               >
@@ -119,7 +119,7 @@ import { SettingsService } from '../../core/services/settings.service';
                 placeholder="https://..."
                 class="w-full px-4 py-3 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none text-neutral-500"
               />
-            </label>
+            </label> -->
           </div>
 
           <!-- Column 2: Operations -->

@@ -1,250 +1,230 @@
-import { AsyncPipe, CurrencyPipe, isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { AsyncPipe, DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, firstValueFrom, map, switchMap } from 'rxjs';
 
-import { BillingService } from '../../core/services/billing.service';
+import { RoomListItem } from '../../core/models/app.models';
 import { BookingService } from '../../core/services/booking.service';
-import { PLATFORM_ID } from '@angular/core';
-
-interface RazorpayPaymentResponse {
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-}
-
-declare global {
-  interface Window {
-    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
-  }
-}
+import { GuestItem, GuestService } from '../../core/services/guest.service';
+import { RoomService } from '../../core/services/room.service';
 
 @Component({
   selector: 'app-admin-bookings-page',
-  imports: [AsyncPipe, CurrencyPipe, ReactiveFormsModule],
+  imports: [AsyncPipe, ReactiveFormsModule, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="animate-fade-in relative z-10 max-w-[1600px] mx-auto">
+    <div class="animate-fade-in relative z-10 max-w-400 mx-auto">
       <section class="mb-8 lg:mb-12">
-        <p
-          class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
-        >
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          {{ title().eyebrow }}
-        </p>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-900 mb-4">
-          {{ title().title }}
-        </h1>
-        <p class="text-lg text-neutral-600 max-w-2xl leading-relaxed">
-          {{ title().description }}
-        </p>
+        <div class="flex items-center justify-between gap-4">
+          <p
+            class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            {{ title().eyebrow }}
+          </p>
+          @if (!isFormOpen()) {
+            <button
+              type="button"
+              class="button px-4 py-2 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+              (click)="openCreateForm()"
+            >
+              New Booking
+            </button>
+          }
+        </div>
       </section>
 
-      <div class="grid grid-cols-1 gap-8 lg:gap-12 items-start">
-        <!-- Form Side -->
-        <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-8">
-          <form
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
-            [formGroup]="form"
-            (ngSubmit)="save()"
-          >
-            <div
-              class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
-            ></div>
-
-            <div class="flex items-center gap-3 mb-8 relative z-10">
+      <div class="grid grid-cols-1 gap-8">
+        @if (isFormOpen()) {
+          <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-8">
+            <form
+              class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
+              [formGroup]="form"
+              (ngSubmit)="save()"
+            >
               <div
-                class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-              </div>
-              <h2 class="text-xl font-bold text-neutral-900 m-0">
-                {{ editingId() ? 'Edit booking' : 'Create booking' }}
-              </h2>
-            </div>
+                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-2xl rounded-full pointer-events-none"
+              ></div>
 
-            <div class="flex flex-col gap-5 relative z-10">
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Guest ID</span
+              <div class="flex items-center gap-3 mb-8 relative z-10">
+                <div
+                  class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
                 >
-                <input
-                  type="text"
-                  formControlName="guestId"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Room ID</span
-                >
-                <input
-                  type="text"
-                  formControlName="roomId"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <div class="grid grid-cols-2 gap-4">
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Check-in</span
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   >
-                  <input
-                    type="datetime-local"
-                    formControlName="checkIn"
-                    class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
-                  />
-                </label>
-
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Check-out</span
-                  >
-                  <input
-                    type="datetime-local"
-                    formControlName="checkOut"
-                    class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
-                  />
-                </label>
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </div>
+                <h2 class="text-xl font-bold text-neutral-900 m-0">
+                  {{ editingId() ? 'Edit booking' : 'Create booking' }}
+                </h2>
               </div>
 
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Guests Number</span
-                >
-                <input
-                  type="number"
-                  min="1"
-                  formControlName="guests"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Special Requests</span
-                >
-                <textarea
-                  formControlName="specialRequests"
-                  rows="2"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none resize-none"
-                ></textarea>
-              </label>
-
-              @if (!editingId()) {
+              <div class="flex flex-col gap-5 relative z-10">
                 <label class="flex flex-col gap-1.5">
                   <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Payment Method</span
+                    >Guest</span
                   >
                   <select
-                    formControlName="paymentMethod"
+                    formControlName="guestId"
                     class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
                   >
-                    <option value="cash">Cash at hotel</option>
-                    <option value="online">Pay online (Razorpay)</option>
+                    <option value="" disabled selected>Select a guest...</option>
+                    @for (guest of guests(); track guest._id) {
+                      <option [value]="guest._id">{{ guest.name }} ({{ guest.email }})</option>
+                    }
                   </select>
                 </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Room</span
+                  >
+                  <select
+                    formControlName="roomId"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  >
+                    <option value="" disabled selected>Select a room...</option>
+                    @for (room of rooms(); track room.id) {
+                      <option [value]="room.id">
+                        {{ room.roomNumber }} - {{ room.type }} ({{ room.capacity }} persons)
+                      </option>
+                    }
+                  </select>
+                </label>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Check-in</span
+                    >
+                    <input
+                      type="datetime-local"
+                      formControlName="checkIn"
+                      class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
+                    />
+                  </label>
+
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Check-out</span
+                    >
+                    <input
+                      type="datetime-local"
+                      formControlName="checkOut"
+                      class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
+                    />
+                  </label>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Guests Number</span
+                  >
+                  <input
+                    type="number"
+                    min="1"
+                    formControlName="guests"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  />
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Special Requests</span
+                  >
+                  <textarea
+                    formControlName="specialRequests"
+                    rows="2"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none resize-none"
+                  ></textarea>
+                </label>
+              </div>
+
+              @if (message()) {
+                <div
+                  class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
+                >
+                  <div
+                    class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
+                </div>
               }
-            </div>
-
-            @if (message()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
+              @if (error()) {
                 <div
-                  class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <div
+                    class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
                 </div>
-                <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
-              </div>
-            }
-            @if (error()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
-                <div
-                  class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                </div>
-                <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
-              </div>
-            }
+              }
 
-            <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
-              <button
-                type="submit"
-                [disabled]="submitting()"
-                class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
-              >
-                {{
-                  editingId()
-                    ? 'Save changes'
-                    : form.getRawValue().paymentMethod === 'online'
-                      ? 'Proceed to online payment'
-                      : 'Create booking'
-                }}
-              </button>
-              @if (editingId()) {
+              <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
+                <button
+                  type="submit"
+                  class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+                >
+                  {{ editingId() ? 'Save changes' : 'Create booking' }}
+                </button>
                 <button
                   type="button"
                   class="w-full py-2.5 text-sm font-semibold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 rounded-xl transition-colors"
                   (click)="reset()"
                 >
-                  Cancel Edit
+                  {{ editingId() ? 'Cancel Edit' : 'Close Form' }}
                 </button>
-              }
-            </div>
-          </form>
-        </div>
+              </div>
+            </form>
+          </div>
+        }
 
-        <!-- Table Side -->
         <div class="lg:col-span-8 xl:col-span-9">
           <div
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
+            class="surface bg-white/80 backdrop-blur-xl rounded-4xl border border-black/5 shadow-sm overflow-hidden h-full flex flex-col"
           >
             <div class="p-6 border-b border-black/5 bg-neutral-50/50 flex items-center gap-4">
               <div
@@ -274,7 +254,7 @@ declare global {
 
             <div class="overflow-x-auto flex-1 p-2">
               @if (bookings$ | async; as bookings) {
-                <table class="w-full text-left border-collapse min-w-[700px]">
+                <table class="w-full text-left border-collapse min-w-175">
                   <thead>
                     <tr>
                       <th
@@ -285,7 +265,12 @@ declare global {
                       <th
                         class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
                       >
-                        Room
+                        Room No/Type
+                      </th>
+                      <th
+                        class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
+                      >
+                        Check-in / Check-out
                       </th>
                       <th
                         class="py-4 px-6 font-bold text-xs uppercase tracking-widest text-neutral-500"
@@ -311,13 +296,17 @@ declare global {
                           <strong class="block text-sm font-bold text-neutral-900 mb-0.5">{{
                             booking.bookingRef
                           }}</strong>
-                          <span
-                            class="text-xs text-neutral-500 truncate max-w-[150px] inline-block"
-                            >{{ booking.guest?.name || booking.guest?.id || 'Guest' }}</span
-                          >
+                          <span class="text-xs text-neutral-500 truncate max-w-37.5 inline-block">{{
+                            booking.guest?.name || booking.guest?.id || 'Guest'
+                          }}</span>
                         </td>
                         <td class="py-4 px-6 text-sm text-neutral-600 font-medium">
+                          {{ booking.room?.roomNumber }} -
                           {{ booking.room?.type || booking.room?.id || 'Room' }}
+                        </td>
+                        <td class="py-4 px-6 text-sm text-neutral-600">
+                          {{ booking.checkIn | date: 'short' }} <br />
+                          {{ booking.checkOut | date: 'short' }}
                         </td>
                         <td class="py-4 px-6">
                           <span
@@ -336,8 +325,9 @@ declare global {
                             {{ booking.status }}
                           </span>
                         </td>
-                        <td class="py-4 px-6 text-sm font-bold text-neutral-900">
-                          {{ booking.totalAmount | currency: 'INR' : 'symbol' : '1.0-0' }}
+
+                        <td class="py-4 px-6 text-sm text-neutral-600">
+                          {{ booking.createdAt | date: 'short' }}
                         </td>
                         <td class="py-4 px-6">
                           <div class="flex items-center justify-end gap-2">
@@ -408,19 +398,21 @@ declare global {
     </div>
   `,
 })
-export class AdminBookingsPageComponent {
-  private razorpayScriptRequest: Promise<void> | null = null;
-  private readonly platformId = inject(PLATFORM_ID);
+export class AdminBookingsPageComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
-  private readonly billingService = inject(BillingService);
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly guestService = inject(GuestService);
+  private readonly roomService = inject(RoomService);
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
 
   readonly message = signal('');
   readonly error = signal('');
-  readonly submitting = signal(false);
   readonly editingId = signal<string | null>(null);
+  readonly isFormOpen = signal(false);
+
+  readonly guests = signal<GuestItem[]>([]);
+  readonly rooms = signal<RoomListItem[]>([]);
   readonly form = this.formBuilder.nonNullable.group({
     guestId: ['', Validators.required],
     roomId: ['', Validators.required],
@@ -428,7 +420,6 @@ export class AdminBookingsPageComponent {
     checkOut: ['', Validators.required],
     guests: [1, [Validators.required, Validators.min(1)]],
     specialRequests: [''],
-    paymentMethod: ['cash' as 'cash' | 'online', Validators.required],
   });
 
   readonly title = signal(
@@ -439,6 +430,19 @@ export class AdminBookingsPageComponent {
     map((result) => result.items),
   );
 
+  async ngOnInit(): Promise<void> {
+    try {
+      const [guestsRes, roomsRes] = await Promise.all([
+        firstValueFrom(this.guestService.listGuests()),
+        firstValueFrom(this.roomService.listRooms({ limit: 100 })),
+      ]);
+      this.guests.set(guestsRes);
+      this.rooms.set(roomsRes);
+    } catch {
+      this.error.set('Unable to load guest and room options.');
+    }
+  }
+
   async save(): Promise<void> {
     this.error.set('');
     this.message.set('');
@@ -448,49 +452,33 @@ export class AdminBookingsPageComponent {
       return;
     }
 
-    this.submitting.set(true);
-
-    const formValue = this.form.getRawValue();
-
     const payload = {
-      ...formValue,
-      checkIn: new Date(formValue.checkIn).toISOString(),
-      checkOut: new Date(formValue.checkOut).toISOString(),
+      ...this.form.getRawValue(),
+      checkIn: new Date(this.form.getRawValue().checkIn).toISOString(),
+      checkOut: new Date(this.form.getRawValue().checkOut).toISOString(),
     };
 
     try {
       if (this.editingId()) {
-        const { paymentMethod, ...updatePayload } = payload;
-        await firstValueFrom(this.bookingService.updateBooking(this.editingId()!, updatePayload));
+        await firstValueFrom(this.bookingService.updateBooking(this.editingId()!, payload));
         this.message.set('Booking updated successfully.');
-      } else if (payload.paymentMethod === 'cash') {
-        await firstValueFrom(this.bookingService.createBooking(payload));
-        this.message.set('Booking created successfully.');
       } else {
-        const onlineOrder = await firstValueFrom(this.billingService.createOnlineOrder(payload));
-        const paymentResult = await this.openRazorpayCheckout(onlineOrder, payload.roomId);
         await firstValueFrom(
-          this.billingService.verifyOnlinePayment({
-            sessionId: onlineOrder.sessionId,
-            razorpayOrderId: paymentResult.razorpay_order_id,
-            razorpayPaymentId: paymentResult.razorpay_payment_id,
-            razorpaySignature: paymentResult.razorpay_signature,
-          }),
+          this.bookingService.createBooking({ ...payload, paymentMethod: 'cash' }),
         );
-        this.message.set('Online payment verified and booking created successfully.');
+        this.message.set('Booking created successfully.');
       }
       this.reset();
       this.refresh$.next();
-    } catch (error) {
-      this.error.set(this.getErrorMessage(error));
-    } finally {
-      this.submitting.set(false);
+    } catch {
+      this.error.set('Unable to save the booking.');
     }
   }
 
   async edit(id: string): Promise<void> {
     this.error.set('');
     const booking = await firstValueFrom(this.bookingService.getBooking(id));
+    this.isFormOpen.set(true);
     this.editingId.set(id);
     this.form.setValue({
       guestId: booking.guest?.id ?? '',
@@ -499,15 +487,12 @@ export class AdminBookingsPageComponent {
       checkOut: booking.checkOut.slice(0, 16),
       guests: booking.guests,
       specialRequests: booking.specialRequests ?? '',
-      paymentMethod: booking.paymentMethod ?? 'cash',
     });
   }
 
   async cancel(id: string): Promise<void> {
     try {
-      await firstValueFrom(
-        this.bookingService.cancelBooking(id, 'Cancelled from bookings workspace'),
-      );
+      await firstValueFrom(this.bookingService.cancelBooking(id, 'Cancelled from admin bookings'));
       this.message.set('Booking cancelled.');
       this.refresh$.next();
     } catch {
@@ -517,6 +502,7 @@ export class AdminBookingsPageComponent {
 
   reset(): void {
     this.editingId.set(null);
+    this.isFormOpen.set(false);
     this.form.reset({
       guestId: '',
       roomId: '',
@@ -524,80 +510,21 @@ export class AdminBookingsPageComponent {
       checkOut: '',
       guests: 1,
       specialRequests: '',
-      paymentMethod: 'cash',
     });
   }
 
-  private getErrorMessage(error: unknown): string {
-    if (error && typeof error === 'object' && 'error' in error) {
-      const apiError = error as { error?: { message?: string } };
-      if (apiError.error?.message) {
-        return apiError.error.message;
-      }
-    }
-
-    return 'Unable to save the booking.';
-  }
-
-  private async ensureRazorpayScript(): Promise<void> {
-    if (!isPlatformBrowser(this.platformId)) {
-      throw new Error('Online payment is only available in browser mode');
-    }
-
-    if (window.Razorpay) {
-      return;
-    }
-
-    if (!this.razorpayScriptRequest) {
-      this.razorpayScriptRequest = new Promise<void>((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.async = true;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Unable to load Razorpay checkout script'));
-        document.body.appendChild(script);
-      });
-    }
-
-    return this.razorpayScriptRequest;
-  }
-
-  private async openRazorpayCheckout(
-    order: { keyId: string; amount: number; currency: string; razorpayOrderId: string },
-    roomId: string,
-  ): Promise<RazorpayPaymentResponse> {
-    await this.ensureRazorpayScript();
-
-    const RazorpayCtor = window.Razorpay;
-
-    if (!RazorpayCtor) {
-      throw new Error('Razorpay checkout is unavailable');
-    }
-
-    return new Promise<RazorpayPaymentResponse>((resolve, reject) => {
-      const razorpay = new RazorpayCtor({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'StayWise',
-        description: `Room booking payment (${roomId})`,
-        order_id: order.razorpayOrderId,
-        handler: (response: Record<string, string>) => {
-          resolve({
-            razorpay_order_id: response['razorpay_order_id'] ?? '',
-            razorpay_payment_id: response['razorpay_payment_id'] ?? '',
-            razorpay_signature: response['razorpay_signature'] ?? '',
-          });
-        },
-        modal: {
-          ondismiss: () => reject(new Error('Payment cancelled by user')),
-        },
-        theme: {
-          color: '#0f172a',
-        },
-      });
-
-      razorpay.open();
+  openCreateForm(): void {
+    this.error.set('');
+    this.message.set('');
+    this.form.reset({
+      guestId: '',
+      roomId: '',
+      checkIn: '',
+      checkOut: '',
+      guests: 1,
+      specialRequests: '',
     });
+    this.editingId.set(null);
+    this.isFormOpen.set(true);
   }
 }
