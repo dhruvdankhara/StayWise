@@ -63,10 +63,6 @@ import { AuthService } from '../core/services/auth.service';
               >
               <code
                 class="px-2.5 py-1.5 rounded-lg bg-white border border-amber-900/10 text-amber-900 font-medium whitespace-nowrap"
-                >manager@staywise.com</code
-              >
-              <code
-                class="px-2.5 py-1.5 rounded-lg bg-white border border-amber-900/10 text-amber-900 font-medium whitespace-nowrap"
                 >reception@staywise.com</code
               >
               <code

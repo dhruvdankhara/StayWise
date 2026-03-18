@@ -28,9 +28,6 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
           >
             {{ vm.title }}
           </h1>
-          <p class="text-lg text-neutral-600 max-w-2xl leading-relaxed">
-            {{ vm.description }}
-          </p>
         </section>
 
         <!-- Metrics Grid -->

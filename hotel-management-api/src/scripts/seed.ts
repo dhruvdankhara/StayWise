@@ -34,14 +34,6 @@ const seed = async (): Promise<void> => {
       isVerified: true,
     },
     {
-      name: "Naina Kapoor",
-      email: "manager@staywise.com",
-      phone: "9876500002",
-      passwordHash,
-      role: "hotel_manager",
-      isVerified: true,
-    },
-    {
       name: "Rohit Sharma",
       email: "reception@staywise.com",
       phone: "9876500003",
@@ -86,7 +78,10 @@ const seed = async (): Promise<void> => {
       capacity: 1,
       baseRate: 4500,
       amenities: ["Wi-Fi", "Breakfast", "Smart TV"],
-      images: [],
+      images: [
+        "https://expressinnindia.com/wp-content/uploads/2024/07/rooms3.jpg",
+        "https://cdn.sanity.io/images/ocl5w36p/prod5/e92180fb602d5370cb4e1dc3c21fa2e5f8a35f05-1040x1120.jpg?w=480&auto=format&dpr=2",
+      ],
       status: "available",
       description: "Compact city-view single room",
     },
@@ -97,7 +92,9 @@ const seed = async (): Promise<void> => {
       capacity: 2,
       baseRate: 7200,
       amenities: ["Wi-Fi", "Breakfast", "Bathtub", "Workspace"],
-      images: [],
+      images: [
+        "https://www.ohotelsindia.com/pune/images/afac6de5e93b1d2018cc56a76528cdd2.jpg",
+      ],
       status: "available",
       description: "Spacious deluxe room with lounge seating",
     },
@@ -108,7 +105,9 @@ const seed = async (): Promise<void> => {
       capacity: 4,
       baseRate: 12000,
       amenities: ["Wi-Fi", "Breakfast", "Living Area", "Mini Bar"],
-      images: [],
+      images: [
+        "https://expressinnindia.com/wp-content/uploads/2022/08/PRESIDENTIAL-SUITE-1-scaled.jpg",
+      ],
       status: "available",
       description: "Premium suite for long or family stays",
     },
@@ -116,7 +115,7 @@ const seed = async (): Promise<void> => {
 
   const activeBooking = await BookingModel.create({
     bookingRef: "SW-SEED-001",
-    guest: users[4]._id,
+    guest: users[3]._id,
     room: rooms[1]._id,
     checkIn: new Date("2026-03-16T12:00:00.000Z"),
     checkOut: new Date("2026-03-18T10:00:00.000Z"),
@@ -126,12 +125,12 @@ const seed = async (): Promise<void> => {
     totalAmount: 14400,
     paymentStatus: "partial",
     specialRequests: "Late check-in",
-    createdBy: users[2]._id,
+    createdBy: users[1]._id,
   });
 
   const completedBooking = await BookingModel.create({
     bookingRef: "SW-SEED-002",
-    guest: users[4]._id,
+    guest: users[3]._id,
     room: rooms[0]._id,
     checkIn: new Date("2026-03-10T12:00:00.000Z"),
     checkOut: new Date("2026-03-12T10:00:00.000Z"),
@@ -142,7 +141,7 @@ const seed = async (): Promise<void> => {
     paymentMethod: "cash",
     totalAmount: 9000,
     paymentStatus: "paid",
-    createdBy: users[2]._id,
+    createdBy: users[1]._id,
   });
 
   await upsertInvoice({
@@ -156,7 +155,7 @@ const seed = async (): Promise<void> => {
 
   await HousekeepingTaskModel.create({
     room: rooms[0]._id,
-    assignedTo: users[3]._id,
+    assignedTo: users[2]._id,
     assignedBy: users[1]._id,
     priority: "normal",
     status: "pending",
@@ -166,7 +165,7 @@ const seed = async (): Promise<void> => {
 
   await ReviewModel.create({
     booking: completedBooking._id,
-    guest: users[4]._id,
+    guest: users[3]._id,
     room: rooms[0]._id,
     rating: 5,
     comment: "Elegant interiors and very responsive staff.",

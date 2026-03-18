@@ -8,6 +8,7 @@ import { ReceptionistBookingsPageComponent } from './receptionist-bookings-page.
 import { ReceptionistCheckInPageComponent } from './receptionist-check-in-page.component';
 import { ReceptionistCheckOutPageComponent } from './receptionist-check-out-page.component';
 import { ReceptionistGuestsPageComponent } from './receptionist-guests-page.component';
+import { ReceptionistHousekeepingPageComponent } from './receptionist-housekeeping-page.component';
 import { ReceptionistDashboardPageComponent } from './receptionist-dashboard-page.component';
 
 export const receptionistRoutes: Routes = [
@@ -37,7 +38,16 @@ export const receptionistRoutes: Routes = [
       { path: 'check-in', component: ReceptionistCheckInPageComponent },
       { path: 'check-out', component: ReceptionistCheckOutPageComponent },
       { path: 'billing', component: ReceptionistBillingPageComponent },
-      { path: 'guests', component: ReceptionistGuestsPageComponent }
+      { path: 'guests', component: ReceptionistGuestsPageComponent },
+      {
+        path: 'housekeeping',
+        component: ReceptionistHousekeepingPageComponent,
+        data: {
+          eyebrow: 'Operations',
+          title: 'Housekeeping task management.',
+          description: 'Assign, reprioritize, and track room cleaning and maintenance tasks.'
+        }
+      }
     ]
   }
 ];

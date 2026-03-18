@@ -13,12 +13,12 @@ export const guestRouter = Router();
 
 guestRouter.use(requireAuth);
 
-// Receptionists and Hotel Managers can manage guests
-guestRouter.get("/", requireRole("hotel_manager", "receptionist"), listGuests);
+// Receptionists can manage guests
+guestRouter.get("/", requireRole("admin", "receptionist"), listGuests);
 
 guestRouter.post(
   "/",
-  requireRole("hotel_manager", "receptionist"),
+  requireRole("admin", "receptionist"),
   validate(createGuestSchema),
   createGuest,
 );

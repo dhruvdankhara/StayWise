@@ -5,12 +5,26 @@ import { mapTask } from '../models/api-helpers';
 import type { HousekeepingTask } from '../models/app.models';
 import { ApiService } from './api.service';
 
+export interface HousekeepingAssignee {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+const mapAssignee = (value: Record<string, unknown>): HousekeepingAssignee => ({
+  id: String(value['id'] ?? value['_id'] ?? ''),
+  name: String(value['name'] ?? ''),
+  email: value['email'] ? String(value['email']) : undefined,
+});
+
 @Injectable({ providedIn: 'root' })
 export class HousekeepingService {
   private readonly api = inject(ApiService);
 
   listTasks(): Observable<HousekeepingTask[]> {
-    return this.api.get<Record<string, unknown>[]>('/housekeeping').pipe(map((items) => items.map(mapTask)));
+    return this.api
+      .get<Record<string, unknown>[]>('/housekeeping')
+      .pipe(map((items) => items.map(mapTask)));
   }
 
   createTask(payload: Record<string, unknown>): Observable<HousekeepingTask> {
@@ -22,6 +36,18 @@ export class HousekeepingService {
   }
 
   updateStatus(id: string, payload: Record<string, unknown>): Observable<HousekeepingTask> {
-    return this.api.patch<Record<string, unknown>>(`/housekeeping/${id}/status`, payload).pipe(map(mapTask));
+    return this.api
+      .patch<Record<string, unknown>>(`/housekeeping/${id}/status`, payload)
+      .pipe(map(mapTask));
+  }
+
+  listAssignableStaff(): Observable<HousekeepingAssignee[]> {
+    return this.api
+      .get<Record<string, unknown>[]>('/housekeeping/assignees')
+      .pipe(map((items) => items.map(mapAssignee)));
+  }
+
+  deleteTask(id: string): Observable<HousekeepingTask> {
+    return this.api.delete<Record<string, unknown>>(`/housekeeping/${id}`).pipe(map(mapTask));
   }
 }

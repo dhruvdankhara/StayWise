@@ -17,142 +17,46 @@ import { RoomListItem } from '../../core/models/app.models';
   template: `
     <div class="animate-fade-in relative z-10 max-w-400 mx-auto">
       <section class="mb-8 lg:mb-12">
-        <p
-          class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
-        >
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          {{ title().eyebrow }}
-        </p>
+        <div class="flex items-center justify-between gap-4">
+          <p
+            class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3 flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            {{ title().eyebrow }}
+          </p>
+          @if (!isFormOpen()) {
+            <button
+              type="button"
+              class="button px-4 py-2 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+              (click)="openCreateForm()"
+            >
+              New Booking
+            </button>
+          }
+        </div>
       </section>
 
       <div class="grid grid-cols-1 gap-8 ">
         <!-- Form Side -->
-        <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-8">
-          <form
-            class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
-            [formGroup]="form"
-            (ngSubmit)="save()"
-          >
-            <div
-              class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
-            ></div>
-
-            <div class="flex items-center gap-3 mb-8 relative z-10">
+        @if (isFormOpen()) {
+          <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-8">
+            <form
+              class="surface bg-white/80 backdrop-blur-xl rounded-[2rem] border border-black/5 shadow-sm p-6 sm:p-8 relative overflow-hidden"
+              [formGroup]="form"
+              (ngSubmit)="save()"
+            >
               <div
-                class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-              </div>
-              <h2 class="text-xl font-bold text-neutral-900 m-0">
-                {{ editingId() ? 'Edit booking' : 'Create booking' }}
-              </h2>
-            </div>
+                class="absolute -top-32 -left-32 w-64 h-64 bg-amber-500/10 blur-[40px] rounded-full pointer-events-none"
+              ></div>
 
-            <div class="flex flex-col gap-5 relative z-10">
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Guest</span
-                >
-                <select
-                  formControlName="guestId"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                >
-                  <option value="" disabled selected>Select a guest...</option>
-                  @for (guest of guests(); track guest._id) {
-                    <option [value]="guest._id">{{ guest.name }} ({{ guest.email }})</option>
-                  }
-                </select>
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Room</span
-                >
-                <select
-                  formControlName="roomId"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                >
-                  <option value="" disabled selected>Select a room...</option>
-                  @for (room of rooms(); track room.id) {
-                    <option [value]="room.id">
-                      {{ room.roomNumber }} - {{ room.type }} ({{ room.capacity }} persons)
-                    </option>
-                  }
-                </select>
-              </label>
-
-              <div class="grid grid-cols-2 gap-4">
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Check-in</span
-                  >
-                  <input
-                    type="datetime-local"
-                    formControlName="checkIn"
-                    class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
-                  />
-                </label>
-
-                <label class="flex flex-col gap-1.5">
-                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                    >Check-out</span
-                  >
-                  <input
-                    type="datetime-local"
-                    formControlName="checkOut"
-                    class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
-                  />
-                </label>
-              </div>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Guests Number</span
-                >
-                <input
-                  type="number"
-                  min="1"
-                  formControlName="guests"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
-                />
-              </label>
-
-              <label class="flex flex-col gap-1.5">
-                <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
-                  >Special Requests</span
-                >
-                <textarea
-                  formControlName="specialRequests"
-                  rows="2"
-                  class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none resize-none"
-                ></textarea>
-              </label>
-            </div>
-
-            @if (message()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
+              <div class="flex items-center gap-3 mb-8 relative z-10">
                 <div
-                  class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-900/10"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -160,58 +64,165 @@ import { RoomListItem } from '../../core/models/app.models';
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <polyline points="20 6 9 17 4 12"></polyline>
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
                 </div>
-                <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
+                <h2 class="text-xl font-bold text-neutral-900 m-0">
+                  {{ editingId() ? 'Edit booking' : 'Create booking' }}
+                </h2>
               </div>
-            }
-            @if (error()) {
-              <div
-                class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
-              >
-                <div
-                  class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                </div>
-                <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
-              </div>
-            }
 
-            <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
-              <button
-                type="submit"
-                class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
-              >
-                {{ editingId() ? 'Save changes' : 'Create booking' }}
-              </button>
-              @if (editingId()) {
+              <div class="flex flex-col gap-5 relative z-10">
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Guest</span
+                  >
+                  <select
+                    formControlName="guestId"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  >
+                    <option value="" disabled selected>Select a guest...</option>
+                    @for (guest of guests(); track guest._id) {
+                      <option [value]="guest._id">{{ guest.name }} ({{ guest.email }})</option>
+                    }
+                  </select>
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Room</span
+                  >
+                  <select
+                    formControlName="roomId"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  >
+                    <option value="" disabled selected>Select a room...</option>
+                    @for (room of rooms(); track room.id) {
+                      <option [value]="room.id">
+                        {{ room.roomNumber }} - {{ room.type }} ({{ room.capacity }} persons)
+                      </option>
+                    }
+                  </select>
+                </label>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Check-in</span
+                    >
+                    <input
+                      type="datetime-local"
+                      formControlName="checkIn"
+                      class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
+                    />
+                  </label>
+
+                  <label class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                      >Check-out</span
+                    >
+                    <input
+                      type="datetime-local"
+                      formControlName="checkOut"
+                      class="w-full px-3 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[13px] outline-none"
+                    />
+                  </label>
+                </div>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Guests Number</span
+                  >
+                  <input
+                    type="number"
+                    min="1"
+                    formControlName="guests"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none"
+                  />
+                </label>
+
+                <label class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Special Requests</span
+                  >
+                  <textarea
+                    formControlName="specialRequests"
+                    rows="2"
+                    class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none resize-none"
+                  ></textarea>
+                </label>
+              </div>
+
+              @if (message()) {
+                <div
+                  class="mt-6 p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 animate-fade-in relative z-10"
+                >
+                  <div
+                    class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-emerald-800 m-0">{{ message() }}</p>
+                </div>
+              }
+              @if (error()) {
+                <div
+                  class="mt-6 p-3 rounded-xl bg-red-50 border border-red-100 flex items-center gap-3 animate-fade-in relative z-10"
+                >
+                  <div
+                    class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <p class="text-xs font-medium text-red-800 m-0">{{ error() }}</p>
+                </div>
+              }
+
+              <div class="mt-8 pt-6 border-t border-black/5 flex flex-col gap-3 relative z-10">
+                <button
+                  type="submit"
+                  class="button w-full justify-center py-2.5 text-sm bg-amber-800 hover:bg-amber-900 border-0 shadow-lg shadow-amber-900/20 text-white rounded-xl transition-transform hover:-translate-y-0.5"
+                >
+                  {{ editingId() ? 'Save changes' : 'Create booking' }}
+                </button>
                 <button
                   type="button"
                   class="w-full py-2.5 text-sm font-semibold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 rounded-xl transition-colors"
                   (click)="reset()"
                 >
-                  Cancel Edit
+                  {{ editingId() ? 'Cancel Edit' : 'Close Form' }}
                 </button>
-              }
-            </div>
-          </form>
-        </div>
+              </div>
+            </form>
+          </div>
+        }
 
         <!-- Table Side -->
         <div class="lg:col-span-8 xl:col-span-9">
@@ -403,6 +414,7 @@ export class ReceptionistBookingsPageComponent implements OnInit {
   readonly message = signal('');
   readonly error = signal('');
   readonly editingId = signal<string | null>(null);
+  readonly isFormOpen = signal(false);
 
   readonly guests = signal<GuestItem[]>([]);
   readonly rooms = signal<RoomListItem[]>([]);
@@ -471,6 +483,7 @@ export class ReceptionistBookingsPageComponent implements OnInit {
   async edit(id: string): Promise<void> {
     this.error.set('');
     const booking = await firstValueFrom(this.bookingService.getBooking(id));
+    this.isFormOpen.set(true);
     this.editingId.set(id);
     this.form.setValue({
       guestId: booking.guest?.id ?? '',
@@ -496,6 +509,7 @@ export class ReceptionistBookingsPageComponent implements OnInit {
 
   reset(): void {
     this.editingId.set(null);
+    this.isFormOpen.set(false);
     this.form.reset({
       guestId: '',
       roomId: '',
@@ -504,5 +518,20 @@ export class ReceptionistBookingsPageComponent implements OnInit {
       guests: 1,
       specialRequests: '',
     });
+  }
+
+  openCreateForm(): void {
+    this.error.set('');
+    this.message.set('');
+    this.form.reset({
+      guestId: '',
+      roomId: '',
+      checkIn: '',
+      checkOut: '',
+      guests: 1,
+      specialRequests: '',
+    });
+    this.editingId.set(null);
+    this.isFormOpen.set(true);
   }
 }

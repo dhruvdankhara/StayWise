@@ -22,7 +22,7 @@ router.post('/', requireAuth, requireRole('admin'), validate(createRoomSchema), 
 router.put(
   '/:id',
   requireAuth,
-  requireRole('admin', 'hotel_manager'),
+  requireRole('admin'),
   validate(updateRoomSchema),
   updateRoom
 );

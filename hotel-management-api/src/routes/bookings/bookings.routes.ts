@@ -24,7 +24,7 @@ const router = Router();
 router.get(
   "/",
   requireAuth,
-  requireRole("admin", "hotel_manager", "receptionist"),
+  requireRole("admin", "receptionist"),
   listBookings,
 );
 router.get("/my", requireAuth, requireRole("guest"), listMyBookings);
@@ -33,7 +33,7 @@ router.post("/", requireAuth, validate(createBookingSchema), createBooking);
 router.put(
   "/:id",
   requireAuth,
-  requireRole("admin", "hotel_manager", "receptionist"),
+  requireRole("admin", "receptionist"),
   validate(updateBookingSchema),
   updateBooking,
 );

@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'hotel_manager' | 'receptionist' | 'cleaning_staff' | 'guest';
+export type UserRole = 'admin' | 'receptionist' | 'cleaning_staff' | 'guest';
 export type BookingPaymentMethod = 'cash' | 'online';
 
 export interface ApiEnvelope<T> {

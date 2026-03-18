@@ -43,21 +43,54 @@ import { RoomService } from '../../core/services/room.service';
               <div
                 class="lg:col-span-7 bg-neutral-100 flex flex-col items-center justify-center p-12 lg:p-20 min-h-[300px] border-b lg:border-b-0 lg:border-r border-black/5 text-neutral-300 relative"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="80"
-                  height="80"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                <div
+                  class="absolute inset-0 bg-neutral-100 flex items-center justify-center text-neutral-300"
                 >
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
+                  @if (vm.room.images && vm.room.images.length > 0) {
+                    @if (!imageLoaded) {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="48"
+                        height="48"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                    }
+
+                    <img
+                      [src]="vm.room.images[0]"
+                      alt="{{ vm.room.type }}"
+                      class="object-cover w-full h-full"
+                      [class.hidden]="!imageLoaded"
+                      (load)="onImageLoad()"
+                      (error)="onImageError()"
+                    />
+                  } @else {
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  }
+                </div>
                 <div class="absolute top-6 left-6">
                   <span
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm text-xs font-bold uppercase tracking-wider rounded-full shadow-sm"
@@ -351,4 +384,14 @@ export class RoomDetailPageComponent {
       }),
     ),
   );
+
+  imageLoaded = false;
+
+  onImageLoad() {
+    this.imageLoaded = true;
+  }
+
+  onImageError() {
+    this.imageLoaded = false;
+  }
 }

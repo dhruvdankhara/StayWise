@@ -7,6 +7,6 @@ import { requireRole } from '../../middleware/roleCheck';
 
 const router = Router();
 
-router.post('/', requireAuth, requireRole('admin', 'hotel_manager'), upload.single('file'), uploadAsset);
+router.post('/', requireAuth, requireRole('admin'), upload.single('file'), uploadAsset);
 
 export { router as uploadRouter };

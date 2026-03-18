@@ -74,31 +74,7 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
   },
   {
-    path: 'admin/reports',
-    renderMode: RenderMode.Server,
-  },
-  {
     path: 'admin/settings',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'hotel-manager',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'hotel-manager/bookings',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'hotel-manager/rooms',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'hotel-manager/housekeeping',
-    renderMode: RenderMode.Server,
-  },
-  {
-    path: 'hotel-manager/reports',
     renderMode: RenderMode.Server,
   },
   {
@@ -123,6 +99,10 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'receptionist/guests',
+    renderMode: RenderMode.Server,
+  },
+  {
+    path: 'receptionist/housekeeping',
     renderMode: RenderMode.Server,
   },
   {

@@ -108,7 +108,6 @@ import { StaffService } from '../../core/services/staff.service';
                   formControlName="role"
                   class="w-full px-4 py-2.5 bg-neutral-50 border border-black/5 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm outline-none cursor-pointer"
                 >
-                  <option value="hotel_manager">Hotel Manager</option>
                   <option value="receptionist">Receptionist</option>
                   <option value="cleaning_staff">Cleaning Staff</option>
                 </select>
@@ -267,8 +266,6 @@ import { StaffService } from '../../core/services/staff.service';
                         <td class="py-4 px-6">
                           <span
                             class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 text-[10px] font-bold uppercase tracking-wider rounded-full"
-                            [class.text-amber-700]="member.role === 'hotel_manager'"
-                            [class.bg-amber-50]="member.role === 'hotel_manager'"
                             [class.text-emerald-700]="member.role === 'receptionist'"
                             [class.bg-emerald-50]="member.role === 'receptionist'"
                             [class.text-blue-700]="member.role === 'cleaning_staff'"
@@ -276,7 +273,6 @@ import { StaffService } from '../../core/services/staff.service';
                           >
                             <span
                               class="w-1.5 h-1.5 rounded-full"
-                              [class.bg-amber-500]="member.role === 'hotel_manager'"
                               [class.bg-emerald-500]="member.role === 'receptionist'"
                               [class.bg-blue-500]="member.role === 'cleaning_staff'"
                             ></span>

@@ -1,6 +1,5 @@
 export const roles = [
   'admin',
-  'hotel_manager',
   'receptionist',
   'cleaning_staff',
   'guest'

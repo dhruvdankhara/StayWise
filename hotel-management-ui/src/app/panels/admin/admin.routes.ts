@@ -5,7 +5,6 @@ import { roleGuard } from '../../core/guards/role.guard';
 import { DashboardLayoutComponent } from '../../layouts/dashboard-layout.component';
 import { AdminBookingsPageComponent } from './admin-bookings-page.component';
 import { AdminDashboardPageComponent } from './admin-dashboard-page.component';
-import { AdminReportsPageComponent } from './admin-reports-page.component';
 import { AdminRoomsPageComponent } from './admin-rooms-page.component';
 import { AdminSettingsPageComponent } from './admin-settings-page.component';
 import { AdminStaffPageComponent } from './admin-staff-page.component';
@@ -42,16 +41,6 @@ export const adminRoutes: Routes = [
           eyebrow: 'Reservations',
           title: 'Reservation governance and booking interventions.',
           description: 'Create, edit, and cancel bookings with live property data.'
-        }
-      },
-      {
-        path: 'reports',
-        component: AdminReportsPageComponent,
-        data: {
-          eyebrow: 'Analytics',
-          title: 'Occupancy, revenue, staff, and guest reporting.',
-          description: 'Review live report payloads and export management documents.',
-          adminOnly: true
         }
       },
       { path: 'settings', component: AdminSettingsPageComponent }

@@ -12,8 +12,8 @@ import { requireRole } from '../../middleware/roleCheck';
 const router = Router();
 
 router.use(requireAuth);
-router.get('/occupancy', requireRole('admin', 'hotel_manager'), occupancyReport);
-router.get('/revenue', requireRole('admin', 'hotel_manager'), revenueReport);
+router.get('/occupancy', requireRole('admin'), occupancyReport);
+router.get('/revenue', requireRole('admin'), revenueReport);
 router.get('/staff', requireRole('admin'), staffReport);
 router.get('/guests', requireRole('admin'), guestReport);
 

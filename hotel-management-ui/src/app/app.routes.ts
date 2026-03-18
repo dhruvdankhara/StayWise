@@ -44,13 +44,6 @@ export const routes: Routes = [
     loadChildren: () => import('./panels/admin/admin.routes').then((module) => module.adminRoutes),
   },
   {
-    path: 'hotel-manager',
-    loadChildren: () =>
-      import('./panels/hotel-manager/hotel-manager.routes').then(
-        (module) => module.hotelManagerRoutes,
-      ),
-  },
-  {
     path: 'receptionist',
     loadChildren: () =>
       import('./panels/receptionist/receptionist.routes').then(

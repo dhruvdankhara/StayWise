@@ -13,7 +13,7 @@ import { createReviewSchema, updateReviewVisibilitySchema } from '../../validato
 
 const router = Router();
 
-router.get('/', requireAuth, requireRole('admin', 'hotel_manager'), listReviews);
+router.get('/', requireAuth, requireRole('admin'), listReviews);
 router.get('/room/:roomId', roomReviews);
 router.post('/', requireAuth, requireRole('guest'), validate(createReviewSchema), createReview);
 router.patch(
