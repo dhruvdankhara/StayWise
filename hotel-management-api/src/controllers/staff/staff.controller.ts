@@ -7,7 +7,7 @@ import { AppError } from '../../utils/AppError';
 import { asyncHandler } from '../../utils/asyncHandler';
 
 export const listStaff = asyncHandler(async (_request: Request, response: Response) => {
-  const staff = await UserModel.find({ role: { $ne: 'guest' } }).select('-passwordHash').sort({ createdAt: -1 });
+  const staff = await UserModel.find({ role: { $nin: ['guest', 'admin'] } }).select('-passwordHash').sort({ createdAt: -1 });
   sendSuccess(response, staff, 'Staff members fetched');
 });
 
