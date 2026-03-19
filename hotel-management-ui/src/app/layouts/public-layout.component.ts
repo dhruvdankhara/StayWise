@@ -73,7 +73,7 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
               >
               <a
                 routerLink="/auth/register"
-                class="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-amber-800 hover:bg-amber-900 text-white text-sm font-medium transition-all shadow-lg shadow-amber-900/20 hover:shadow-lg hover:-translate-y-0.5 whitespace-nowrap"
+                class="button !py-2.5 !text-sm shadow-lg shadow-amber-900/20 hover:scale-[1.02] transition-transform duration-200"
               >
                 Book your stay
               </a>

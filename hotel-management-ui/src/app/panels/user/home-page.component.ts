@@ -28,7 +28,8 @@ import { combineLatest } from 'rxjs';
             <h1
               class="text-5xl lg:text-7xl font-bold tracking-tight text-neutral-900 leading-[1.1]"
             >
-              <span class="text-amber-700">{{ vm.settings.name }}</span> powers your entire hotel
+              <!-- <span style="color: var(--accent) !important">{{ vm.settings.name }}</span> powers your entire hotel -->
+               <span class="text-amber-700">{{ vm.settings.name }}</span> powers your entire hotel
               from one central system.
             </h1>
 
