@@ -173,7 +173,22 @@ export class GuestProfilePageComponent {
     this.message.set('');
     this.error.set('');
     try {
-      await this.authService.updateProfile(this.form.getRawValue());
+      const raw = this.form.getRawValue();
+      const payload: { name: string; phone?: string; profileImage?: string } = {
+        name: raw.name.trim(),
+      };
+
+      const phone = raw.phone.trim();
+      if (phone) {
+        payload.phone = phone;
+      }
+
+      const profileImage = raw.profileImage.trim();
+      if (profileImage) {
+        payload.profileImage = profileImage;
+      }
+
+      await this.authService.updateProfile(payload);
       this.message.set('Profile updated successfully.');
     } catch {
       this.error.set('Unable to update the profile.');
