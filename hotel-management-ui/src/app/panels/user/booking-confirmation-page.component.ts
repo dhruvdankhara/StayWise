@@ -168,7 +168,7 @@ import { BookingService } from '../../core/services/booking.service';
               </a>
               <a
                 routerLink="/rooms"
-                class="button w-full sm:w-auto justify-center bg-white text-neutral-700 hover:bg-neutral-50 hover:text-black border border-black/10 shadow-sm transition-colors"
+                class="button w-full sm:w-auto justify-center bg-white text-neutral-700 hover:bg-neutral-50 hover:text-black hover:scale-[1.02] border border-black/10 shadow-sm transition-colors"
               >
                 Back to rooms
               </a>

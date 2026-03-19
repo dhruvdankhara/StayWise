@@ -195,11 +195,11 @@ import { RoomService } from '../../core/services/room.service';
                     }}<span class="text-sm font-normal text-neutral-500">/night</span></strong
                   >
                   <a
-                    [routerLink]="['/rooms', room.id]"
-                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-amber-800 hover:bg-amber-900 text-white text-sm font-medium transition-colors"
-                  >
-                    Details
-                  </a>
+                      [routerLink]="['/rooms', room.id]"
+                      class="button shadow-lg shadow-amber-900/20 hover:scale-[1.02] transition-transform duration-200"
+                    >
+                      Details
+                    </a>
                 </div>
               </div>
             </article>
