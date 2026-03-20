@@ -1,15 +1,14 @@
-import { CurrencyPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import type { RoomListItem } from '../../core/models/app.models';
 import { RoomService } from '../../core/services/room.service';
+import { RoomListingCardComponent } from '../../shared/components/room-listing-card.component';
 
 @Component({
   selector: 'app-room-search-page',
-  imports: [CurrencyPipe, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RoomListingCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="animate-fade-in pb-20 pt-12 text-left">
@@ -98,111 +97,7 @@ import { RoomService } from '../../core/services/room.service';
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           @for (room of rooms(); track room.id) {
-            <article
-              class="surface listing-card group flex flex-col h-full bg-white/40 border border-white/50 rounded-[2rem] overflow-hidden hover:bg-white/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 !p-0 text-left"
-            >
-              <div
-                class="relative h-48 sm:h-56 w-full bg-neutral-100 overflow-hidden border-b border-black/5"
-              >
-                <div
-                  class="absolute inset-0 bg-neutral-100 flex items-center justify-center text-neutral-300"
-                >
-                  @if (room.images && room.images.length > 0) {
-                    @if (!imageLoaded) {
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="48"
-                        height="48"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                        <polyline points="21 15 16 10 5 21"></polyline>
-                      </svg>
-                    }
-
-                    <img
-                      [src]="room.images[0]"
-                      alt="{{ room.type }}"
-                      class="object-cover w-full h-full"
-                      [class.hidden]="!imageLoaded"
-                      (load)="onImageLoad()"
-                      (error)="onImageError()"
-                    />
-                  } @else {
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                      <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg>
-                  }
-                </div>
-
-                <div class="absolute top-4 left-4">
-                  <span
-                    class="pill inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm text-xs font-bold uppercase tracking-wider rounded-full shadow-sm"
-                    [class.text-emerald-700]="room.status === 'AVAILABLE'"
-                    [class.text-amber-700]="room.status !== 'AVAILABLE'"
-                  >
-                    <span
-                      class="w-1.5 h-1.5 rounded-full"
-                      [class.bg-emerald-500]="room.status === 'AVAILABLE'"
-                      [class.bg-amber-500]="room.status !== 'AVAILABLE'"
-                    ></span>
-                    {{ room.status }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="p-6 flex-1 flex flex-col">
-                <h3
-                  class="text-2xl font-bold text-neutral-900 mb-2 group-hover:text-amber-800 transition-colors uppercase tracking-tight"
-                >
-                  {{ room.type }}
-                </h3>
-                <p class="text-neutral-600 text-sm line-clamp-2 mb-6 flex-1">
-                  {{ room.description || 'Live inventory from the StayWise property backend.' }}
-                </p>
-
-                <div class="flex flex-wrap gap-2 mb-8">
-                  @for (amenity of room.amenities; track amenity) {
-                    <span
-                      class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-black/5 text-xs font-medium text-neutral-700 border border-black/5"
-                    >
-                      {{ amenity }}
-                    </span>
-                  }
-                </div>
-
-                <div class="flex items-center justify-between pt-4 border-t border-black/5 mt-auto">
-                  <strong class="text-2xl text-neutral-900"
-                    >{{ room.baseRate | currency: 'INR' : 'symbol' : '1.0-0'
-                    }}<span class="text-sm font-normal text-neutral-500">/night</span></strong
-                  >
-                  <a
-                      [routerLink]="['/rooms', room.id]"
-                      class="button shadow-lg shadow-amber-900/20 hover:scale-[1.02] transition-transform duration-200"
-                    >
-                      Details
-                    </a>
-                </div>
-              </div>
-            </article>
+            <app-room-listing-card [room]="room" />
           } @empty {
             <article
               class="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center surface border border-white/50 rounded-[2rem] bg-white/40"
@@ -274,15 +169,5 @@ export class RoomSearchPageComponent {
   private async loadDefaultRooms(): Promise<void> {
     const rooms = await firstValueFrom(this.roomService.listRooms({ limit: 12 }));
     this.rooms.set(rooms);
-  }
-
-  imageLoaded = false;
-
-  onImageLoad() {
-    this.imageLoaded = true;
-  }
-
-  onImageError() {
-    this.imageLoaded = false;
   }
 }

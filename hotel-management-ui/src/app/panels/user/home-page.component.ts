@@ -1,13 +1,14 @@
 import { RoomService } from '../../core/services/room.service';
 import { SettingsService } from '../../core/services/settings.service';
-import { AsyncPipe, CurrencyPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { combineLatest } from 'rxjs';
+import { RoomListingCardComponent } from '../../shared/components/room-listing-card.component';
 
 @Component({
   selector: 'app-home-page',
-  imports: [AsyncPipe, CurrencyPipe, RouterLink],
+  imports: [AsyncPipe, RouterLink, RoomListingCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (vm$ | async; as vm) {
@@ -29,7 +30,7 @@ import { combineLatest } from 'rxjs';
               class="text-5xl lg:text-7xl font-bold tracking-tight text-neutral-900 leading-[1.1]"
             >
               <!-- <span style="color: var(--accent) !important">{{ vm.settings.name }}</span> powers your entire hotel -->
-               <span class="text-amber-700">{{ vm.settings.name }}</span> powers your entire hotel
+              <span class="text-amber-700">{{ vm.settings.name }}</span> powers your entire hotel
               from one central system.
             </h1>
 
@@ -147,7 +148,7 @@ import { combineLatest } from 'rxjs';
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Check-out {{ vm.settings.checkOutTime }} 
+                    Check-out {{ vm.settings.checkOutTime }}
                   </span>
                 </div>
               </div>
@@ -193,151 +194,10 @@ import { combineLatest } from 'rxjs';
 
           <div class="card-grid pt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @for (room of vm.rooms; track room.id) {
-              <article
-                class="surface listing-card group flex flex-col h-full bg-white/40 border border-white/50 rounded-[2rem] overflow-hidden hover:bg-white/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 !p-0"
-              >
-                <div
-                  class="relative h-48 sm:h-56 w-full bg-neutral-100 overflow-hidden border-b border-black/5"
-                >
-                  <div
-                    class="absolute inset-0 bg-neutral-100 flex items-center justify-center text-neutral-300"
-                  >
-                    <!--  <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                      <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg> -->
-                    <img
-                      [src]="room.images[0]"
-                      alt="{{ room.type }}"
-                      class="object-cover w-full h-full"
-                    />
-                  </div>
-                  <div class="absolute top-4 left-4">
-                    <span
-                      class="pill inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm text-xs font-bold uppercase tracking-wider rounded-full shadow-sm"
-                      [class.text-emerald-700]="room.status === 'AVAILABLE'"
-                      [class.text-amber-700]="room.status !== 'AVAILABLE'"
-                    >
-                      <span
-                        class="w-1.5 h-1.5 rounded-full"
-                        [class.bg-emerald-500]="room.status === 'AVAILABLE'"
-                        [class.bg-amber-500]="room.status !== 'AVAILABLE'"
-                      ></span>
-                      {{ room.status }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="p-6 flex-1 flex flex-col">
-                  <h3
-                    class="text-2xl font-bold text-neutral-900 mb-2 group-hover:text-amber-800 transition-colors"
-                  >
-                    {{ room.type }}
-                  </h3>
-                  <p class="text-neutral-600 text-sm line-clamp-2 mb-6 flex-1">
-                    {{
-                      room.description ||
-                        'Thoughtfully prepared for premium comfort and efficient operations.'
-                    }}
-                  </p>
-
-                  <div
-                    class="grid grid-cols-2 gap-y-3 gap-x-4 mb-8 text-sm text-neutral-600 bg-black/5 p-4 rounded-2xl"
-                  >
-                    <div class="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="text-amber-700/70"
-                      >
-                        <path
-                          d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                        ></path>
-                        <polyline points="22,6 12,13 2,6"></polyline>
-                      </svg>
-                      Room {{ room.roomNumber }}
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="text-amber-700/70"
-                      >
-                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                        <path d="M9 22v-4h6v4"></path>
-                        <path d="M8 6h.01"></path>
-                        <path d="M16 6h.01"></path>
-                        <path d="M12 6h.01"></path>
-                        <path d="M12 10h.01"></path>
-                        <path d="M12 14h.01"></path>
-                        <path d="M16 10h.01"></path>
-                        <path d="M16 14h.01"></path>
-                        <path d="M8 10h.01"></path>
-                        <path d="M8 14h.01"></path>
-                      </svg>
-                      Floor {{ room.floor }}
-                    </div>
-                    <div class="flex items-center gap-2 col-span-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="text-amber-700/70"
-                      >
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                      </svg>
-                      {{ room.capacity }} guest capacity
-                    </div>
-                  </div>
-
-                  <div class="flex items-center justify-between pt-4 border-t border-black/5">
-                    <strong class="text-2xl text-neutral-900"
-                      >{{ room.baseRate | currency: 'INR' : 'symbol' : '1.0-0'
-                      }}<span class="text-sm font-normal text-neutral-500">/night</span></strong
-                    >
-                    <a
-                      [routerLink]="['/rooms', room.id]"
-                      class="button shadow-lg shadow-amber-900/20 hover:scale-[1.02] transition-transform duration-200"
-                    >
-                      Details
-                    </a>
-                  </div>
-                </div>
-              </article>
+              <app-room-listing-card
+                [room]="room"
+                [descriptionFallback]="'Thoughtfully prepared for premium comfort and efficient operations.'"
+              />
             }
           </div>
         </section>

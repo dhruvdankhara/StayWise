@@ -112,7 +112,9 @@ import { RoomService } from '../../core/services/room.service';
                   <p class="text-sm font-bold text-amber-700 uppercase tracking-widest mb-3">
                     Room Information
                   </p>
-                  <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 mb-6">
+                  <h1
+                    class="text-3xl uppercase md:text-4xl font-bold tracking-tight text-neutral-900 mb-6"
+                  >
                     {{ vm.room.type }}
                   </h1>
                   <p class="text-neutral-600 leading-relaxed mb-8">
