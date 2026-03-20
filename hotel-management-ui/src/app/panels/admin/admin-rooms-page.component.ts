@@ -174,6 +174,50 @@ const ROOM_STATUS_OPTIONS = [
                   ></textarea>
                 </label>
 
+                <label class="flex flex-col gap-2">
+                  <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
+                    >Room Features</span
+                  >
+                  <div
+                    class="w-full p-3 bg-neutral-50 border border-black/5 rounded-xl focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/20 focus-within:border-amber-500 transition-all"
+                  >
+                    <div class="flex flex-wrap gap-2 mb-2">
+                      @for (feature of form.getRawValue().amenities; track feature) {
+                        <span
+                          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-semibold"
+                        >
+                          {{ feature }}
+                          <button
+                            type="button"
+                            class="w-4 h-4 rounded-full bg-amber-200/80 hover:bg-amber-300 text-amber-900 leading-none"
+                            (click)="removeFeature(feature)"
+                            [attr.aria-label]="'Remove ' + feature"
+                          >
+                            x
+                          </button>
+                        </span>
+                      }
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input
+                        type="text"
+                        [value]="featureInput()"
+                        (input)="onFeatureInput($event)"
+                        (keydown)="onFeatureKeydown($event)"
+                        class="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-sm outline-none"
+                        placeholder="Type feature and press Enter"
+                      />
+                      <button
+                        type="button"
+                        class="px-3 py-2 text-xs font-semibold rounded-lg bg-amber-800 text-white hover:bg-amber-900"
+                        (click)="addFeature()"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </label>
+
                 <label class="flex flex-col gap-1.5">
                   <span class="text-xs font-semibold text-neutral-700 uppercase tracking-wide"
                     >Upload Photo</span
@@ -487,6 +531,7 @@ export class AdminRoomsPageComponent {
   readonly isFormOpen = signal(false);
   readonly message = signal('');
   readonly error = signal('');
+  readonly featureInput = signal('');
   readonly roomTypeOptions = ROOM_TYPE_OPTIONS;
   readonly roomStatusOptions = ROOM_STATUS_OPTIONS;
   readonly form = this.formBuilder.nonNullable.group({
@@ -497,7 +542,7 @@ export class AdminRoomsPageComponent {
     baseRate: [4500, Validators.required],
     status: ['available', Validators.required],
     description: [''],
-    amenities: ['Wi-Fi'],
+    amenities: [['Wi-Fi'] as string[]],
     images: [[] as string[]],
   });
   readonly rooms$ = this.refresh$.pipe(switchMap(() => this.roomService.listRooms({ limit: 50 })));
@@ -507,11 +552,7 @@ export class AdminRoomsPageComponent {
     this.message.set('');
     const payload = {
       ...this.form.getRawValue(),
-      amenities: this.form
-        .getRawValue()
-        .amenities.split(',')
-        .map((item) => item.trim())
-        .filter(Boolean),
+      amenities: this.form.getRawValue().amenities,
     };
 
     try {
@@ -541,9 +582,10 @@ export class AdminRoomsPageComponent {
       baseRate: room.baseRate,
       status: room.status,
       description: room.description ?? '',
-      amenities: room.amenities.join(', '),
+      amenities: room.amenities,
       images: room.images,
     });
+    this.featureInput.set('');
   }
 
   async remove(id: string): Promise<void> {
@@ -573,6 +615,43 @@ export class AdminRoomsPageComponent {
     }
   }
 
+  onFeatureInput(event: Event): void {
+    this.featureInput.set((event.target as HTMLInputElement).value);
+  }
+
+  onFeatureKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ',') {
+      this.addFeature(event);
+    }
+  }
+
+  addFeature(event?: KeyboardEvent): void {
+    if (event) {
+      event.preventDefault();
+    }
+
+    const value = this.featureInput().trim();
+    if (!value) {
+      return;
+    }
+
+    const current = this.form.getRawValue().amenities;
+    if (current.some((item) => item.toLowerCase() === value.toLowerCase())) {
+      this.featureInput.set('');
+      return;
+    }
+
+    this.form.patchValue({ amenities: [...current, value] });
+    this.featureInput.set('');
+  }
+
+  removeFeature(feature: string): void {
+    const updated = this.form
+      .getRawValue()
+      .amenities.filter((item) => item.toLowerCase() !== feature.toLowerCase());
+    this.form.patchValue({ amenities: updated });
+  }
+
   openCreateForm(): void {
     this.error.set('');
     this.message.set('');
@@ -586,9 +665,10 @@ export class AdminRoomsPageComponent {
       baseRate: 4500,
       status: 'available',
       description: '',
-      amenities: 'Wi-Fi',
+      amenities: ['Wi-Fi'],
       images: [],
     });
+    this.featureInput.set('');
   }
 
   resetForm(): void {
@@ -602,8 +682,9 @@ export class AdminRoomsPageComponent {
       baseRate: 4500,
       status: 'available',
       description: '',
-      amenities: 'Wi-Fi',
+      amenities: ['Wi-Fi'],
       images: [],
     });
+    this.featureInput.set('');
   }
 }
