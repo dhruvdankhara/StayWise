@@ -21,7 +21,7 @@ import { RoomListingCardComponent } from '../../shared/components/room-listing-c
               class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-950/5 border border-orange-900/10 mb-2"
             >
               <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-              <p class="eyebrow !m-0 !text-xs text-amber-800">
+              <p class="eyebrow m-0! text-xs! text-amber-800">
                 Luxury hospitality, unified operations
               </p>
             </div>
@@ -78,7 +78,7 @@ import { RoomListingCardComponent } from '../../shared/components/room-listing-c
             ></div>
 
             <div
-              class="hero-card surface relative z-10 border border-white/40 shadow-2xl overflow-hidden rounded-[2rem] p-8 backdrop-blur-xl bg-orange-50/60"
+              class="hero-card surface relative z-10 border border-white/40 shadow-2xl overflow-hidden rounded-4xl p-8 backdrop-blur-xl bg-orange-50/60"
             >
               <div class="flex items-center gap-3 mb-8">
                 <div
@@ -99,7 +99,7 @@ import { RoomListingCardComponent } from '../../shared/components/room-listing-c
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                   </svg>
                 </div>
-                <p class="eyebrow !m-0">Hotel Profile</p>
+                <p class="eyebrow m-0!">Hotel Profile</p>
               </div>
 
               <div class="stack-list space-y-6">
@@ -162,7 +162,7 @@ import { RoomListingCardComponent } from '../../shared/components/room-listing-c
           >
             <div class="space-y-2">
               <div class="inline-flex items-center gap-2">
-                <p class="eyebrow !m-0 text-amber-800">Available room inventory</p>
+                <p class="eyebrow m-0! text-amber-800">Available room inventory</p>
               </div>
               <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-neutral-900">
                 Book directly into <br class="hidden md:block" />

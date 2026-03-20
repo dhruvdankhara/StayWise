@@ -36,7 +36,7 @@ declare global {
                   class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-950/5 border border-orange-900/10 mb-4"
                 >
                   <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                  <p class="eyebrow !m-0 !text-xs text-amber-800">Secure Checkout</p>
+                  <p class="eyebrow m-0! text-xs! text-amber-800">Secure Checkout</p>
                 </div>
                 <h1
                   class="text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 leading-[1.1]"
@@ -50,7 +50,7 @@ declare global {
               </div>
 
               <div
-                class="surface relative border border-amber-900/10 shadow-lg rounded-[2rem] overflow-hidden backdrop-blur-xl bg-orange-50/60 p-1"
+                class="surface relative border border-amber-900/10 shadow-lg rounded-4xl overflow-hidden backdrop-blur-xl bg-orange-50/60 p-1"
               >
                 <div
                   class="p-6 md:p-8 space-y-6 bg-white/40 rounded-[1.75rem] border border-white/50"
@@ -133,7 +133,7 @@ declare global {
               ></div>
 
               <form
-                class="surface relative z-10 border border-white/60 shadow-2xl rounded-[2rem] p-6 sm:p-10 backdrop-blur-xl bg-white/80 flex flex-col gap-6"
+                class="surface relative z-10 border border-white/60 shadow-2xl rounded-4xl p-6 sm:p-10 backdrop-blur-xl bg-white/80 flex flex-col gap-6"
                 [formGroup]="form"
                 (ngSubmit)="submit()"
               >

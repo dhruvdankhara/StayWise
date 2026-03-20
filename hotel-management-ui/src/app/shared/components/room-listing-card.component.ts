@@ -10,7 +10,7 @@ import type { RoomListItem } from '../../core/models/app.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article
-      class="surface listing-card group flex flex-col h-full bg-white/40 border border-white/50 rounded-[2rem] overflow-hidden hover:bg-white/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 !p-0 text-left"
+      class="surface listing-card group flex flex-col h-full bg-white/40 border border-white/50 rounded-4xl overflow-hidden hover:bg-white/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 p-0! text-left"
     >
       <div
         class="relative h-48 sm:h-56 w-full bg-neutral-100 overflow-hidden border-b border-black/5"

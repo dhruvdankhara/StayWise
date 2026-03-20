@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article
-      class="surface p-6 rounded-[2rem] bg-white border border-black/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col items-start h-full group"
+      class="surface p-6 rounded-4xl bg-white border border-black/5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden flex flex-col items-start h-full group"
     >
       <div
         class="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 blur-[20px] rounded-full group-hover:bg-amber-500/20 transition-colors"

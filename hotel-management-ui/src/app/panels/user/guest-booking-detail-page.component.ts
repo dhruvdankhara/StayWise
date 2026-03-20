@@ -102,7 +102,7 @@ import { ReviewService } from '../../core/services/review.service';
                   >
                     <div class="flex items-start md:items-center gap-6">
                       <div
-                        class="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-amber-100 to-orange-50 border border-amber-200/50 flex items-center justify-center text-amber-700 shrink-0 shadow-inner"
+                        class="w-20 h-20 rounded-3xl bg-linear-to-br from-amber-100 to-orange-50 border border-amber-200/50 flex items-center justify-center text-amber-700 shrink-0 shadow-inner"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -185,7 +185,7 @@ import { ReviewService } from '../../core/services/review.service';
                     class="grid grid-cols-1 md:grid-cols-2 gap-6 py-10 border-b border-neutral-200/60"
                   >
                     <div
-                      class="bg-gradient-to-br from-orange-50/50 to-amber-50/30 border border-orange-100 rounded-[2rem] p-6 transition-all hover:shadow-md hover:border-orange-200"
+                      class="bg-linear-to-br from-orange-50/50 to-amber-50/30 border border-orange-100 rounded-4xl p-6 transition-all hover:shadow-md hover:border-orange-200"
                     >
                       <div class="flex items-center gap-4 mb-4">
                         <div
@@ -215,7 +215,7 @@ import { ReviewService } from '../../core/services/review.service';
                       <div class="space-y-4 pl-2 border-l-2 border-orange-200/50 ml-6">
                         <div class="relative">
                           <span
-                            class="absolute -left-[11px] top-2 w-2 h-2 rounded-full bg-orange-400"
+                            class="absolute -left-2.75 top-2 w-2 h-2 rounded-full bg-orange-400"
                           ></span>
                           <p
                             class="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-1"
@@ -228,7 +228,7 @@ import { ReviewService } from '../../core/services/review.service';
                         </div>
                         <div class="relative pt-2">
                           <span
-                            class="absolute -left-[11px] top-4 w-2 h-2 rounded-full bg-orange-400"
+                            class="absolute -left-2.75 top-4 w-2 h-2 rounded-full bg-orange-400"
                           ></span>
                           <p
                             class="text-xs text-neutral-500 font-bold uppercase tracking-wider mb-1"
@@ -243,7 +243,7 @@ import { ReviewService } from '../../core/services/review.service';
                     </div>
 
                     <div
-                      class="bg-gradient-to-br from-emerald-50/50 to-teal-50/30 border border-emerald-100 rounded-[2rem] p-6 flex flex-col justify-between transition-all hover:shadow-md hover:border-emerald-200"
+                      class="bg-linear-to-br from-emerald-50/50 to-teal-50/30 border border-emerald-100 rounded-4xl p-6 flex flex-col justify-between transition-all hover:shadow-md hover:border-emerald-200"
                     >
                       <div class="flex items-center gap-4 mb-4">
                         <div
@@ -362,12 +362,12 @@ import { ReviewService } from '../../core/services/review.service';
             </div>
 
             <!-- Sidebar Actions & Review -->
-            <aside class="lg:col-span-4 flex flex-col gap-6 relative z-10 sticky top-24">
+            <aside class="lg:col-span-4 flex flex-col gap-6 relative z-10 top-24">
               <!-- Action Buttons -->
               <div class="grid grid-cols-1 gap-4">
                 <button
                   type="button"
-                  class="flex items-center justify-between px-6 py-4 rounded-[1.5rem] bg-white border border-neutral-200/80 hover:border-amber-300 hover:bg-amber-50 hover:ring-4 hover:ring-amber-500/10 text-neutral-800 hover:text-amber-900 font-bold transition-all shadow-lg shadow-neutral-200/20 group"
+                  class="flex items-center justify-between px-6 py-4 rounded-3xl bg-white border border-neutral-200/80 hover:border-amber-300 hover:bg-amber-50 hover:ring-4 hover:ring-amber-500/10 text-neutral-800 hover:text-amber-900 font-bold transition-all shadow-lg shadow-neutral-200/20 group"
                   (click)="downloadInvoice(booking.id)"
                 >
                   <span class="flex items-center gap-3">
@@ -410,7 +410,7 @@ import { ReviewService } from '../../core/services/review.service';
                 </button>
                 <!--  <button
                   type="button"
-                  class="flex items-center justify-between px-6 py-4 rounded-[1.5rem] bg-white border border-neutral-200/80 hover:border-red-300 hover:bg-red-50 hover:ring-4 hover:ring-red-500/10 text-neutral-800 hover:text-red-700 font-bold transition-all shadow-lg shadow-neutral-200/20 group"
+                  class="flex items-center justify-between px-6 py-4 rounded-3xl bg-white border border-neutral-200/80 hover:border-red-300 hover:bg-red-50 hover:ring-4 hover:ring-red-500/10 text-neutral-800 hover:text-red-700 font-bold transition-all shadow-lg shadow-neutral-200/20 group"
                   (click)="cancel(booking.id)"
                 >
                   <span class="flex items-center gap-3">
@@ -424,7 +424,7 @@ import { ReviewService } from '../../core/services/review.service';
 
               <!-- Review Form -->
               <form
-                class="border border-white/60 shadow-2xl shadow-amber-900/10 rounded-[2rem] p-6 lg:p-8 backdrop-blur-2xl bg-gradient-to-br from-white/90 via-white/80 to-amber-50/90 flex flex-col gap-6 relative overflow-hidden"
+                class="border border-white/60 shadow-2xl shadow-amber-900/10 rounded-4xl p-6 lg:p-8 backdrop-blur-2xl bg-linear-to-br from-white/90 via-white/80 to-amber-50/90 flex flex-col gap-6 relative overflow-hidden"
                 [formGroup]="reviewForm"
                 (ngSubmit)="submitReview(booking.id, booking.room?.id || '')"
               >
@@ -446,7 +446,7 @@ import { ReviewService } from '../../core/services/review.service';
 
                 <div class="flex items-center gap-4 mb-2 relative z-10">
                   <div
-                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/20 flex items-center justify-center text-white shrink-0"
+                    class="w-14 h-14 rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/20 flex items-center justify-center text-white shrink-0"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -565,10 +565,10 @@ import { ReviewService } from '../../core/services/review.service';
 
                 <button
                   type="submit"
-                  class="w-full relative z-10 shadow-lg shadow-amber-600/30 hover:shadow-xl hover:shadow-amber-600/40 hover:-translate-y-1 transition-all duration-300 py-4 mt-2 rounded-xl flex items-center justify-center gap-3 text-white font-bold text-lg bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 border-0 overflow-hidden group"
+                  class="w-full relative z-10 shadow-lg shadow-amber-600/30 hover:shadow-xl hover:shadow-amber-600/40 hover:-translate-y-1 transition-all duration-300 py-4 mt-2 rounded-xl flex items-center justify-center gap-3 text-white font-bold text-lg bg-linear-to-r from-amber-600 via-orange-600 to-amber-700 border-0 overflow-hidden group"
                 >
                   <span
-                    class="absolute inset-0 w-full h-full -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer"
+                    class="absolute inset-0 w-full h-full -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-shimmer"
                   ></span>
                   <span class="relative">Submit Review</span>
                   <svg

@@ -37,10 +37,10 @@ import { MetricCardComponent } from '../../shared/components/metric-card.compone
           <!-- Metrics Grid -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             <div
-              class="bg-gradient-to-br from-amber-600 to-amber-900 rounded-[2rem] p-8 shadow-xl relative overflow-hidden text-white flex flex-col md:col-span-3 lg:col-span-1 border border-amber-900/20"
+              class="bg-linear-to-br from-amber-600 to-amber-900 rounded-4xl p-8 shadow-xl relative overflow-hidden text-white flex flex-col md:col-span-3 lg:col-span-1 border border-amber-900/20"
             >
               <div
-                class="absolute -right-20 -bottom-20 w-64 h-64 bg-white/10 blur-[40px] rounded-full"
+                class="absolute -right-20 -bottom-20 w-64 h-64 bg-white/10 blur-2xl rounded-full"
               ></div>
               <div
                 class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm shadow-sm flex items-center justify-center text-white mb-6 border border-white/20"

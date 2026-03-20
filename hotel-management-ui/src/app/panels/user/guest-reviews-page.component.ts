@@ -35,7 +35,7 @@ import { BookingService } from '../../core/services/booking.service';
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (booking of bookings; track booking.id) {
             <article
-              class="surface flex flex-col h-full bg-white/80 backdrop-blur-xl border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all rounded-[2rem] p-6 sm:p-8 relative overflow-hidden group"
+              class="surface flex flex-col h-full bg-white/80 backdrop-blur-xl border border-white/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all rounded-4xl p-6 sm:p-8 relative overflow-hidden group"
             >
               <!-- Background accent hover effect -->
               <div

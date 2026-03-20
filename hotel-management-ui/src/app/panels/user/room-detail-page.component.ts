@@ -41,7 +41,7 @@ import { RoomService } from '../../core/services/room.service';
           >
             <div class="grid grid-cols-1 lg:grid-cols-12 max-w-full">
               <div
-                class="lg:col-span-7 bg-neutral-100 flex flex-col items-center justify-center p-12 lg:p-20 min-h-[300px] border-b lg:border-b-0 lg:border-r border-black/5 text-neutral-300 relative"
+                class="lg:col-span-7 bg-neutral-100 flex flex-col items-center justify-center p-12 lg:p-20 min-h-75 border-b lg:border-b-0 lg:border-r border-black/5 text-neutral-300 relative"
               >
                 <div
                   class="absolute inset-0 bg-neutral-100 flex items-center justify-center text-neutral-300"
@@ -297,7 +297,7 @@ import { RoomService } from '../../core/services/room.service';
                 class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8 pb-4 border-b border-black/5"
               >
                 <div>
-                  <p class="eyebrow !m-0 !text-sm text-amber-800 mb-2">Visible Reviews</p>
+                  <p class="eyebrow m-0! text-sm! text-amber-800 mb-2">Visible Reviews</p>
                   <h2 class="text-3xl font-bold tracking-tight text-neutral-900">Guest Feedback</h2>
                 </div>
               </div>
@@ -338,7 +338,7 @@ import { RoomService } from '../../core/services/room.service';
                   </article>
                 } @empty {
                   <article
-                    class="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center surface border border-neutral-200/60 rounded-[2rem] bg-neutral-50/50 border-dashed"
+                    class="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center surface border border-neutral-200/60 rounded-4xl bg-neutral-50/50 border-dashed"
                   >
                     <div
                       class="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-neutral-400 mb-4 border border-black/5"

@@ -54,7 +54,7 @@ import { BookingService } from '../../core/services/booking.service';
           class="surface rounded-[2.5rem] bg-white shadow-sm border border-black/5 overflow-hidden"
         >
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[800px]">
+            <table class="w-full text-left border-collapse min-w-200">
               <thead>
                 <tr class="bg-neutral-50/80 border-b border-black/5">
                   <th

@@ -15,7 +15,7 @@ import { BookingService } from '../../core/services/booking.service';
     >
       <!-- Ambient background decorations -->
       <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-[500px] bg-emerald-500/10 blur-[100px] rounded-full point-events-none -z-10"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-125 bg-emerald-500/10 blur-[100px] rounded-full point-events-none -z-10"
       ></div>
 
       @if (booking$ | async; as booking) {

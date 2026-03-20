@@ -18,7 +18,7 @@ import { RoomListingCardComponent } from '../../shared/components/room-listing-c
             class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-950/5 border border-orange-900/10 mb-4"
           >
             <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-            <p class="eyebrow !m-0 !text-xs text-amber-800">Room Search</p>
+            <p class="eyebrow m-0! text-xs! text-amber-800">Room Search</p>
           </div>
           <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-neutral-900 leading-[1.1]">
             Find your perfect stay.
@@ -100,7 +100,7 @@ import { RoomListingCardComponent } from '../../shared/components/room-listing-c
             <app-room-listing-card [room]="room" />
           } @empty {
             <article
-              class="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center surface border border-white/50 rounded-[2rem] bg-white/40"
+              class="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center surface border border-white/50 rounded-4xl bg-white/40"
             >
               <div
                 class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-amber-800 mb-6"
