@@ -54,6 +54,22 @@ import { AuthService } from '../../core/services/auth.service';
                 {{ form.get('name')?.value || 'Guest User' }}
               </h3>
               <p class="text-sm text-neutral-500">Main Account Holder</p>
+              <label
+                class="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-amber-800 hover:text-amber-900"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  (change)="onProfileImageSelected($event)"
+                  [disabled]="isUploadingImage()"
+                />
+                @if (isUploadingImage()) {
+                  Uploading image...
+                } @else {
+                  Upload profile image
+                }
+              </label>
             </div>
           </div>
 
@@ -148,7 +164,7 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="mt-10 pt-8 border-t border-black/5 flex justify-end">
           <button
             type="submit"
-            [disabled]="form.invalid"
+            [disabled]="form.invalid || isUploadingImage()"
             class="button py-3 px-8 text-base bg-amber-800 hover:bg-amber-900 text-white rounded-xl shadow-lg border-0 shadow-amber-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:-translate-y-0.5"
           >
             Save Changes
@@ -163,11 +179,43 @@ export class GuestProfilePageComponent {
   private readonly formBuilder = inject(FormBuilder);
   readonly message = signal('');
   readonly error = signal('');
+  readonly isUploadingImage = signal(false);
   readonly form = this.formBuilder.nonNullable.group({
     name: [this.authService.user()?.name ?? '', [Validators.required]],
     phone: [this.authService.user()?.phone ?? ''],
     profileImage: [this.authService.user()?.profileImage ?? ''],
   });
+
+  async onProfileImageSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.message.set('');
+      this.error.set('Please select an image up to 5MB.');
+      input.value = '';
+      return;
+    }
+
+    this.message.set('');
+    this.error.set('');
+    this.isUploadingImage.set(true);
+
+    try {
+      const user = await this.authService.uploadProfileImage(file);
+      this.form.patchValue({ profileImage: user.profileImage ?? '' });
+      this.message.set('Profile image uploaded successfully.');
+    } catch {
+      this.error.set('Unable to upload profile image.');
+    } finally {
+      this.isUploadingImage.set(false);
+      input.value = '';
+    }
+  }
 
   async submit(): Promise<void> {
     this.message.set('');

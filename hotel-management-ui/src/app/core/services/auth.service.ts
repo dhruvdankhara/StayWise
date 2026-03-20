@@ -47,7 +47,9 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<boolean> {
-    const session = await firstValueFrom(this.api.post<AuthSession>('/auth/login', { email, password }));
+    const session = await firstValueFrom(
+      this.api.post<AuthSession>('/auth/login', { email, password }),
+    );
     this.persistToken(session.token);
     await this.refreshCurrentUser(session.user);
     return true;
@@ -79,7 +81,20 @@ export class AuthService {
   }
 
   async updateProfile(payload: Record<string, unknown>): Promise<UserProfile> {
-    const response = await firstValueFrom(this.api.put<Record<string, unknown>>('/auth/me', payload));
+    const response = await firstValueFrom(
+      this.api.put<Record<string, unknown>>('/auth/me', payload),
+    );
+    const user = mapUserProfile(response);
+    this.user.set(user);
+    return user;
+  }
+
+  async uploadProfileImage(file: File): Promise<UserProfile> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await firstValueFrom(
+      this.api.upload<Record<string, unknown>>('/auth/me/profile-image', formData),
+    );
     const user = mapUserProfile(response);
     this.user.set(user);
     return user;
