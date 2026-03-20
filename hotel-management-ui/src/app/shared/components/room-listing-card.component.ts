@@ -72,9 +72,18 @@ import type { RoomListItem } from '../../core/models/app.models';
         <div
           class="grid grid-cols-2 gap-y-3 gap-x-4 mb-5 text-sm text-neutral-600 bg-black/5 p-4 rounded-2xl"
         >
-          <div class="flex items-center gap-2">Room {{ room().roomNumber }}</div>
-          <div class="flex items-center gap-2">Floor {{ room().floor }}</div>
-          <div class="flex items-center gap-2 col-span-2">{{ room().capacity }} guest capacity</div>
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-door-open text-amber-700/70" aria-hidden="true"></i>
+            Room {{ room().roomNumber }}
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-building text-amber-700/70" aria-hidden="true"></i>
+            Floor {{ room().floor }}
+          </div>
+          <div class="flex items-center gap-2 col-span-2">
+            <i class="fa-solid fa-user-group text-amber-700/70" aria-hidden="true"></i>
+            {{ room().capacity }} guest capacity
+          </div>
         </div>
 
         @if (room().amenities.length > 0) {
