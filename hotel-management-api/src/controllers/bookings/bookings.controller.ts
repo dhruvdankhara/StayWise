@@ -5,7 +5,6 @@ import { BookingModel } from "../../models/Booking";
 import { HousekeepingTaskModel } from "../../models/HousekeepingTask";
 import { RoomModel } from "../../models/Room";
 import { UserModel } from "../../models/User";
-import { createAuditLog } from "../../services/audit.service";
 import {
   calculateBookingAmount,
   ensureRoomAvailability,
@@ -134,13 +133,6 @@ export const createBooking = asyncHandler(
       createdBy: request.user ? new Types.ObjectId(request.user.id) : undefined,
     });
 
-    await createAuditLog({
-      actor: request.user?.id,
-      action: "create_booking",
-      entity: "booking",
-      entityId: booking.id,
-    });
-
     sendSuccess(response, booking, "Booking created", 201);
   },
 );
@@ -262,14 +254,6 @@ export const cancelBooking = asyncHandler(
     booking.cancellationReason = request.body.reason;
     await booking.save();
     await RoomModel.findByIdAndUpdate(booking.room, { status: "available" });
-
-    await createAuditLog({
-      actor: request.user?.id,
-      action: "cancel_booking",
-      entity: "booking",
-      entityId: booking.id,
-      reason: request.body.reason,
-    });
 
     sendSuccess(response, booking, "Booking cancelled");
   },

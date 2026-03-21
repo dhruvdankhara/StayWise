@@ -5,7 +5,6 @@ import { cloudinary } from "../../config/cloudinary";
 import { env } from "../../config/env";
 import { UserModel } from "../../models/User";
 import { VerificationTokenModel } from "../../models/VerificationToken";
-import { createAuditLog } from "../../services/audit.service";
 import { generateToken, sendEmail } from "../../services/email.service";
 import { sendSuccess } from "../../utils/api";
 import { AppError } from "../../utils/AppError";
@@ -61,13 +60,6 @@ export const register = asyncHandler(
       "Verify your StayWise account",
       `<p>Welcome to StayWise, ${name}.</p><p>Use this token to verify your email: <strong>${token}</strong></p>`,
     );
-
-    await createAuditLog({
-      actor: user.id,
-      action: "register",
-      entity: "user",
-      entityId: user.id,
-    });
 
     sendSuccess(
       response,
@@ -213,13 +205,6 @@ export const updateMe = asyncHandler(
       throw new AppError(404, "User not found");
     }
 
-    await createAuditLog({
-      actor: request.user?.id,
-      action: "update_profile",
-      entity: "user",
-      entityId: user.id,
-    });
-
     sendSuccess(response, user, "Profile updated");
   },
 );
@@ -263,13 +248,6 @@ export const uploadProfileImage = asyncHandler(
     if (!user) {
       throw new AppError(404, "User not found");
     }
-
-    await createAuditLog({
-      actor: request.user?.id,
-      action: "upload_profile_image",
-      entity: "user",
-      entityId: user.id,
-    });
 
     sendSuccess(response, user, "Profile image uploaded");
   },

@@ -9,7 +9,6 @@ import { InvoiceModel } from "../../models/Invoice";
 import { PaymentSessionModel } from "../../models/PaymentSession";
 import { PaymentTransactionModel } from "../../models/PaymentTransaction";
 import { HotelSettingsModel } from "../../models/HotelSettings";
-import { createAuditLog } from "../../services/audit.service";
 import {
   calculateBookingAmount,
   ensureRoomAvailability,
@@ -340,17 +339,6 @@ export const verifyOnlinePayment = asyncHandler(
     session.verifiedAt = new Date();
     session.booking = booking._id;
     await session.save();
-
-    await createAuditLog({
-      actor: request.user?.id,
-      action: "online_booking_payment_verified",
-      entity: "booking",
-      entityId: booking.id,
-      metadata: {
-        sessionId: session.id,
-        orderId: request.body.razorpayOrderId,
-      },
-    });
 
     sendSuccess(
       response,
