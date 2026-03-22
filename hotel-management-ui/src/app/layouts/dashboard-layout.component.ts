@@ -28,7 +28,15 @@ import { BrandMarkComponent } from '../shared/components/brand-mark.component';
             <div
               class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-amber-800 font-bold uppercase shrink-0 border border-amber-100 shadow-sm text-lg"
             >
-              {{ user()?.name?.charAt(0) || 'U' }}
+              @if (user()?.profileImage?.toString()) {
+                <img
+                  [src]="user()?.profileImage"
+                  alt="Avatar"
+                  class="w-full h-full object-cover rounded-full"
+                />
+              } @else {
+                {{ user()?.name?.charAt(0) || 'U' }}
+              }
             </div>
             <div class="overflow-hidden">
               <strong class="block text-sm font-bold text-neutral-900 truncate mb-0.5">{{
